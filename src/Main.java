@@ -6,7 +6,8 @@ import java.io.IOException;
 public class Main {
     public static void main(String[] args) throws IOException {
         BufferedImage myPicture = ImageIO.read(new File("test.jpg"));
-        Pixel[] newImage = MedianCut.Algorithm(ImageManuplation.ImageToMatrix(myPicture), 16);
-        ImageIO.write(ImageManuplation.MatrixToImage(newImage, myPicture), "jpg", new File("new-test.jpg"));
+        Pixel[] newImage = MedianCut.Algorithm(ImageManipulation.ImageToMatrix(myPicture), 16);
+        ImageIO.write(ImageManipulation.MatrixToImage(newImage, myPicture), "jpg", new File("new-test.jpg"));
+        
     }
 }

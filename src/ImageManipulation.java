@@ -1,6 +1,6 @@
 import java.awt.image.BufferedImage;
 
-public class ImageManuplation {
+public class ImageManipulation {
     public static Pixel convertToPixel(int x) {
         String hexString = Integer.toHexString(x);
         Pixel ans = new Pixel();

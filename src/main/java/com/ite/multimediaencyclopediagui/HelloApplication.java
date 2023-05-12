@@ -15,8 +15,13 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 public class HelloApplication extends Application {
+    Stage window;
     @Override
     public void start(Stage stage) {
+
+        window = stage;
+        window.setTitle("Multimedia Project");
+
         FileChooser fileChooser = new FileChooser();
         Button uploadImageButton = new Button("Choose a photo");
 

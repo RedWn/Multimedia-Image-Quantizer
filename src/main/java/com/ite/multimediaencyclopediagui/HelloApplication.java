@@ -1,7 +1,7 @@
 package com.ite.multimediaencyclopediagui;
 
-import com.ite.multimediaencyclopediagui.images.ImageManipulation;
-import com.ite.multimediaencyclopediagui.images.MedianCut;
+import com.ite.multimediaencyclopediagui.images.ImageUtils;
+import com.ite.multimediaencyclopediagui.images.MedianCutAlgorithm;
 import com.ite.multimediaencyclopediagui.images.Pixel;
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -33,24 +33,27 @@ public class HelloApplication extends Application {
         window = stage;
         window.setTitle("Multimedia Project");
 
-        FileChooser fileChooser = new FileChooser();
-        Button uploadImageButton = new Button("Choose a photo");
+        Image placeholderImage = new Image("default_image.png");
+
+        // Before + After image views
         ImageView imageView1 = new ImageView();
         ImageView imageView2 = new ImageView();
 
+        imageView1.setImage(placeholderImage);
+        imageView2.setImage(placeholderImage);
 
-        Image defaultImage = new Image("default_image.png");
-        imageView1.setImage(defaultImage);
-        imageView2.setImage(defaultImage);
         imageView1.setFitWidth(250);
         imageView1.setFitHeight(250);
+
         imageView2.setFitWidth(250);
         imageView2.setFitHeight(250);
+
+        FileChooser fileChooser = new FileChooser();
+        Button uploadImageButton = new Button("Choose a photo");
 
         uploadImageButton.setOnAction(e -> {
             try {
                 File chosenFile = fileChooser.showOpenDialog(stage);
-
 
                 Image image = new Image(chosenFile.toURI().toString());
                 imageView1.setImage(image);
@@ -58,10 +61,18 @@ public class HelloApplication extends Application {
                 imageView1.setFitWidth(250);
                 imageView1.setFitHeight(250);
 
-                BufferedImage myPicture = ImageIO.read(chosenFile);
-                Pixel[] newImage = MedianCut.Algorithm(ImageManipulation.ImageToMatrix(myPicture), 16);
+                BufferedImage originalPicture = ImageIO.read(chosenFile);
+                Pixel[] originalPicturePixels = ImageUtils.ImageToPixels(originalPicture);
+                Pixel[] quantizedPixels = MedianCutAlgorithm.GetQuantizedPixels(originalPicturePixels, 16);
 
-                ImageIO.write(ImageManipulation.MatrixToImage(newImage, myPicture), "jpg", new File("new-test.jpg"));
+                BufferedImage bufferedQuantizedImage = ImageUtils.PixelsToImage(quantizedPixels, originalPicture);
+                Image nonBufferedQuantizedImageToMakeJavaHappy = ImageUtils.ConvertBufferedImageToImage(bufferedQuantizedImage);
+                ImageIO.write(bufferedQuantizedImage, "jpg", new File("new-test.jpg"));
+
+                imageView2.setImage(nonBufferedQuantizedImageToMakeJavaHappy);
+                imageView1.setPreserveRatio(true);
+                imageView1.setFitWidth(250);
+                imageView1.setFitHeight(250);
 
             } catch (Exception exception) {
                 exception.printStackTrace();
@@ -84,17 +95,12 @@ public class HelloApplication extends Application {
         imageVBox1.getChildren().addAll(label1, imageView1);
         imageVBox2.getChildren().addAll(label2, imageView2);
 
-
-
         hBox.setAlignment(Pos.CENTER);
         hBox.getChildren().addAll(imageVBox1, separator, imageVBox2);
 
         VBox vBox = new VBox();
         vBox.setAlignment(Pos.CENTER);
         vBox.getChildren().addAll(uploadImageButton, hBox);
-
-
-
 
         StackPane layout = new StackPane();
         layout.getChildren().addAll(vBox);

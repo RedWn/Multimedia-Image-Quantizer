@@ -36,7 +36,7 @@ public class HelloApplication extends Application {
                 ImageIO.write(ImageManipulation.MatrixToImage(newImage, myPicture), "jpg", new File("new-test.jpg"));
 
             } catch (Exception exception) {
-                System.out.println(exception);
+                exception.printStackTrace();
             }
         });
 

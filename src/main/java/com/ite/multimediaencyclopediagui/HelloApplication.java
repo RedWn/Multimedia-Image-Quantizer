@@ -4,26 +4,14 @@ import com.ite.multimediaencyclopediagui.images.ImageUtils;
 import com.ite.multimediaencyclopediagui.images.MedianCutAlgorithm;
 import com.ite.multimediaencyclopediagui.images.Pixel;
 import javafx.application.Application;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
-import javafx.geometry.Pos;
-import javafx.geometry.VPos;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Separator;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
+import javafx.geometry.*;
+import javafx.stage.*;
+import javafx.scene.*;
+import javafx.scene.control.*;
+import javafx.scene.image.*;
+import javafx.scene.layout.*;
+import javafx.scene.text.*;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -36,7 +24,8 @@ public class HelloApplication extends Application {
      * Directory where images are stored after applying the algorithm.
      */
     private SimpleStringProperty resultsDirectory = new SimpleStringProperty();
-    Stage window;
+    static Stage window;
+    public static ImageView imageViewOriginal, imageViewFirstAlgo, imageViewSecondAlgo;
     @Override
     public void start(Stage stage) {
         window = stage;
@@ -44,9 +33,9 @@ public class HelloApplication extends Application {
 
         Image placeholderImage = new Image("default_image.png");
 
-        ImageView imageViewOriginal = new ImageView();
-        ImageView imageViewFirstAlgo = new ImageView();
-        ImageView imageViewSecondAlgo = new ImageView();
+        imageViewOriginal = new ImageView();
+        imageViewFirstAlgo = new ImageView();
+        imageViewSecondAlgo = new ImageView();
 
         imageViewOriginal.setImage(placeholderImage);
         imageViewFirstAlgo.setImage(placeholderImage);
@@ -141,7 +130,7 @@ public class HelloApplication extends Application {
         appContainer.setAlignment(Pos.CENTER);
         appContainer.setPadding(new Insets(10));
         appContainer.setSpacing(20);
-        appContainer.getChildren().addAll(chooseDirectoryButton, resultsDirectoryTextNode, uploadImageButton, imagesContainer);
+        appContainer.getChildren().addAll(chooseDirectoryButton, resultsDirectoryTextNode, uploadImageButton, imagesContainer, ColorPalette.colorPaletteButton());
 
         StackPane layout = new StackPane();
         layout.getChildren().addAll(appContainer);

@@ -18,7 +18,7 @@ public class HelloApplication extends Application {
     @Override
     public void start(Stage stage) {
         FileChooser fileChooser = new FileChooser();
-        Button uploadImageButton = new Button("Upload Image");
+        Button uploadImageButton = new Button("Choose a photo");
 
         uploadImageButton.setOnAction(e -> {
             try {

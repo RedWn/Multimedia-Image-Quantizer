@@ -39,24 +39,30 @@ public class HelloApplication extends Application {
     Stage window;
     @Override
     public void start(Stage stage) {
-
         window = stage;
         window.setTitle("Multimedia Project");
 
         Image placeholderImage = new Image("default_image.png");
 
-        // Before + After image views
-        ImageView imageView1 = new ImageView();
-        ImageView imageView2 = new ImageView();
+        ImageView imageViewOriginal = new ImageView();
+        ImageView imageViewFirstAlgo = new ImageView();
+        ImageView imageViewSecondAlgo = new ImageView();
 
-        imageView1.setImage(placeholderImage);
-        imageView2.setImage(placeholderImage);
+        imageViewOriginal.setImage(placeholderImage);
+        imageViewFirstAlgo.setImage(placeholderImage);
+        imageViewSecondAlgo.setImage(placeholderImage);
 
-        imageView1.setFitWidth(250);
-        imageView1.setFitHeight(250);
+        imageViewOriginal.setFitWidth(250);
+        imageViewFirstAlgo.setFitWidth(250);
+        imageViewSecondAlgo.setFitWidth(250);
 
-        imageView2.setFitWidth(250);
-        imageView2.setFitHeight(250);
+        imageViewOriginal.setFitHeight(250);
+        imageViewFirstAlgo.setFitHeight(250);
+        imageViewSecondAlgo.setFitHeight(250);
+
+        imageViewOriginal.setPreserveRatio(true);
+        imageViewFirstAlgo.setPreserveRatio(true);
+        imageViewSecondAlgo.setPreserveRatio(true);
 
         DirectoryChooser directoryChooser = new DirectoryChooser();
         Text resultsDirectoryTextNode = new Text();
@@ -74,14 +80,10 @@ public class HelloApplication extends Application {
         uploadImageButton.setOnAction(e -> {
             try {
                 File chosenFile = fileChooser.showOpenDialog(stage);
-
                 System.out.println(resultsDirectory.getValue());
 
                 Image image = new Image(chosenFile.toURI().toString());
-                imageView1.setImage(image);
-                imageView1.setPreserveRatio(true);
-                imageView1.setFitWidth(250);
-                imageView1.setFitHeight(250);
+                imageViewOriginal.setImage(image);
 
                 BufferedImage originalPicture = ImageIO.read(chosenFile);
                 Pixel[] originalPicturePixels = ImageUtils.ImageToPixels(originalPicture);
@@ -93,43 +95,56 @@ public class HelloApplication extends Application {
                 String pathname = Path.of(resultsDirectory.getValue(), "new-test.jpg").toString();
                 ImageIO.write(bufferedQuantizedImage, "jpg", new File(pathname));
 
-                imageView2.setImage(nonBufferedQuantizedImageToMakeJavaHappy);
-                imageView1.setPreserveRatio(true);
-                imageView1.setFitWidth(250);
-                imageView1.setFitHeight(250);
+                imageViewFirstAlgo.setImage(nonBufferedQuantizedImageToMakeJavaHappy);
+                imageViewSecondAlgo.setImage(nonBufferedQuantizedImageToMakeJavaHappy);
 
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
         });
 
-        HBox hBox = new HBox();
-        Separator separator = new Separator();
-        separator.setOrientation(Orientation.VERTICAL);
-        separator.setPrefHeight(80);
-        separator.setValignment(VPos.CENTER);
-        separator.setPadding(new Insets(10));
 
-        Label label1 = new Label("Before");
-        Label label2 = new Label("After");
+
+        Separator separator1 = new Separator();
+        separator1.setOrientation(Orientation.VERTICAL);
+        separator1.setPrefHeight(80);
+        separator1.setValignment(VPos.CENTER);
+        separator1.setPadding(new Insets(10));
+
+        Separator separator2 = new Separator();
+        separator2.setOrientation(Orientation.VERTICAL);
+        separator2.setPrefHeight(80);
+        separator2.setValignment(VPos.CENTER);
+        separator2.setPadding(new Insets(10));
+
+        Label label1 = new Label("Original");
+        Label label2 = new Label("1st Algorithm");
+        Label label3 = new Label("2nd Algorithm");
+
         VBox imageVBox1 = new VBox();
         VBox imageVBox2 = new VBox();
+        VBox imageVBox3 = new VBox();
+
         imageVBox1.setAlignment(Pos.CENTER);
         imageVBox2.setAlignment(Pos.CENTER);
-        imageVBox1.getChildren().addAll(label1, imageView1);
-        imageVBox2.getChildren().addAll(label2, imageView2);
+        imageVBox3.setAlignment(Pos.CENTER);
 
-        hBox.setAlignment(Pos.CENTER);
-        hBox.getChildren().addAll(imageVBox1, separator, imageVBox2);
+        imageVBox1.getChildren().addAll(label1, imageViewOriginal);
+        imageVBox2.getChildren().addAll(label2, imageViewFirstAlgo);
+        imageVBox3.getChildren().addAll(label3, imageViewSecondAlgo);
 
-        VBox vBox = new VBox();
-        vBox.setAlignment(Pos.CENTER);
-        vBox.setPadding(new Insets(10));
-        vBox.setSpacing(20);
-        vBox.getChildren().addAll(chooseDirectoryButton, resultsDirectoryTextNode, uploadImageButton, hBox);
+        HBox imagesContainer = new HBox();
+        imagesContainer.setAlignment(Pos.CENTER);
+        imagesContainer.getChildren().addAll(imageVBox1, separator1, imageVBox2, separator2, imageVBox3);
+
+        VBox appContainer = new VBox();
+        appContainer.setAlignment(Pos.CENTER);
+        appContainer.setPadding(new Insets(10));
+        appContainer.setSpacing(20);
+        appContainer.getChildren().addAll(chooseDirectoryButton, resultsDirectoryTextNode, uploadImageButton, imagesContainer);
 
         StackPane layout = new StackPane();
-        layout.getChildren().addAll(vBox);
+        layout.getChildren().addAll(appContainer);
 
         stage.setScene(new Scene(layout, 800, 500));
         stage.show();

@@ -4,6 +4,9 @@ import com.ite.multimediaencyclopediagui.images.ImageUtils;
 import com.ite.multimediaencyclopediagui.images.MedianCutAlgorithm;
 import com.ite.multimediaencyclopediagui.images.Pixel;
 import javafx.application.Application;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -17,15 +20,22 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.nio.file.Path;
 
 
 public class HelloApplication extends Application {
+    /**
+     * Directory where images are stored after applying the algorithm.
+     */
+    private SimpleStringProperty resultsDirectory = new SimpleStringProperty();
     Stage window;
     @Override
     public void start(Stage stage) {
@@ -48,12 +58,24 @@ public class HelloApplication extends Application {
         imageView2.setFitWidth(250);
         imageView2.setFitHeight(250);
 
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        Text resultsDirectoryTextNode = new Text();
+        Button chooseDirectoryButton = new Button("Choose a directory");
+
+        chooseDirectoryButton.setOnAction(e -> {
+            File chosenDirectory = directoryChooser.showDialog(stage);
+            this.resultsDirectory.set(chosenDirectory.toString());
+            resultsDirectoryTextNode.setText("Selected directory: " + chosenDirectory.toString());
+        });
+
         FileChooser fileChooser = new FileChooser();
         Button uploadImageButton = new Button("Choose a photo");
 
         uploadImageButton.setOnAction(e -> {
             try {
                 File chosenFile = fileChooser.showOpenDialog(stage);
+
+                System.out.println(resultsDirectory.getValue());
 
                 Image image = new Image(chosenFile.toURI().toString());
                 imageView1.setImage(image);
@@ -67,7 +89,9 @@ public class HelloApplication extends Application {
 
                 BufferedImage bufferedQuantizedImage = ImageUtils.PixelsToImage(quantizedPixels, originalPicture);
                 Image nonBufferedQuantizedImageToMakeJavaHappy = ImageUtils.ConvertBufferedImageToImage(bufferedQuantizedImage);
-                ImageIO.write(bufferedQuantizedImage, "jpg", new File("new-test.jpg"));
+
+                String pathname = Path.of(resultsDirectory.getValue(), "new-test.jpg").toString();
+                ImageIO.write(bufferedQuantizedImage, "jpg", new File(pathname));
 
                 imageView2.setImage(nonBufferedQuantizedImageToMakeJavaHappy);
                 imageView1.setPreserveRatio(true);
@@ -100,7 +124,9 @@ public class HelloApplication extends Application {
 
         VBox vBox = new VBox();
         vBox.setAlignment(Pos.CENTER);
-        vBox.getChildren().addAll(uploadImageButton, hBox);
+        vBox.setPadding(new Insets(10));
+        vBox.setSpacing(20);
+        vBox.getChildren().addAll(chooseDirectoryButton, resultsDirectoryTextNode, uploadImageButton, hBox);
 
         StackPane layout = new StackPane();
         layout.getChildren().addAll(vBox);

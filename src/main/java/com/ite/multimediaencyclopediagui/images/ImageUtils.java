@@ -10,17 +10,17 @@ import java.awt.image.DataBufferInt;
 import java.nio.IntBuffer;
 
 public class ImageUtils {
-    public static Pixel convertToPixel(int x) {
-        String hexString = Integer.toHexString(x);
+    private static Pixel convertRGBToPixel(int rgbValue) {
+        String rgbHexString = Integer.toHexString(rgbValue);
         Pixel ans = new Pixel();
-        for (int i = 2; i < hexString.length(); i += 2) {
-            String temp = hexString.substring(i, i + 2);
+        for (int i = 2; i < rgbHexString.length(); i += 2) {
+            String temp = rgbHexString.substring(i, i + 2);
             ans.RGB[(i - 2) / 2] = Integer.parseInt(temp, 16);
         }
         return ans;
     }
 
-    public static int convertFromRGBArray(int[] x) {
+    private static int convertFromRGBArray(int[] x) {
         StringBuilder ans = new StringBuilder("ff");
         for (int j : x) {
             String temp = Integer.toHexString(j);
@@ -34,10 +34,10 @@ public class ImageUtils {
     }
 
     public static Pixel[] ImageToPixels(BufferedImage BI) {
-        int size = BI.getHeight() * BI.getWidth();
-        Pixel[] ans = new Pixel[size];
-        for (int i = 0; i < size; i++) {
-            ans[i] = convertToPixel(BI.getRGB(i % BI.getWidth(), i / BI.getWidth()));
+        int imageSize = BI.getHeight() * BI.getWidth();
+        Pixel[] ans = new Pixel[imageSize];
+        for (int i = 0; i < imageSize; i++) {
+            ans[i] = convertRGBToPixel(BI.getRGB(i % BI.getWidth(), i / BI.getWidth()));
             ans[i].index = i;
         }
         return ans;

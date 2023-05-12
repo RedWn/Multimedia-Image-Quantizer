@@ -4,9 +4,11 @@ import com.ite.multimediaencyclopediagui.images.ImageManipulation;
 import com.ite.multimediaencyclopediagui.images.MedianCut;
 import com.ite.multimediaencyclopediagui.images.Pixel;
 import javafx.application.Application;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -38,8 +40,15 @@ public class HelloApplication extends Application {
             }
         });
 
+
+        VBox vBox = new VBox();
+        vBox.setAlignment(Pos.CENTER);
+        vBox.getChildren().addAll(uploadImageButton);
+
+
+
         StackPane layout = new StackPane();
-        layout.getChildren().addAll(uploadImageButton);
+        layout.getChildren().addAll(vBox);
 
         stage.setScene(new Scene(layout, 500, 500));
         stage.show();

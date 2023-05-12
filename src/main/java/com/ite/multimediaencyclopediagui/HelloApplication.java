@@ -23,7 +23,7 @@ public class HelloApplication extends Application {
     /**
      * Directory where images are stored after applying the algorithm.
      */
-    private SimpleStringProperty resultsDirectory = new SimpleStringProperty();
+    private final SimpleStringProperty resultsDirectory = new SimpleStringProperty();
     static Stage window;
     static ImageView imageViewOriginal, imageViewFirstAlgo, imageViewSecondAlgo;
     static RadioButton originalImageRadioButton, FirstAlgoRadioButton, SecondAlgoRadioButton;
@@ -61,7 +61,7 @@ public class HelloApplication extends Application {
         chooseDirectoryButton.setOnAction(e -> {
             File chosenDirectory = directoryChooser.showDialog(stage);
             this.resultsDirectory.set(chosenDirectory.toString());
-            resultsDirectoryTextNode.setText("Selected directory: " + chosenDirectory.toString());
+            resultsDirectoryTextNode.setText("Selected directory: " + chosenDirectory);
         });
 
         FileChooser fileChooser = new FileChooser();
@@ -127,7 +127,7 @@ public class HelloApplication extends Application {
         // Create the radio buttons
         originalImageRadioButton = new RadioButton("Original");
         FirstAlgoRadioButton = new RadioButton("1st Algorithm");
-        SecondAlgoRadioButton = new RadioButton("2st Algorithm");
+        SecondAlgoRadioButton = new RadioButton("2ed Algorithm");
 
         // Create a toggle group and add the radio buttons to it
         ToggleGroup toggleGroupRadioButtons = new ToggleGroup();

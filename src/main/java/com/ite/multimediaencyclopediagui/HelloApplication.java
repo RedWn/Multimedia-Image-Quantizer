@@ -25,7 +25,8 @@ public class HelloApplication extends Application {
      */
     private SimpleStringProperty resultsDirectory = new SimpleStringProperty();
     static Stage window;
-    public static ImageView imageViewOriginal, imageViewFirstAlgo, imageViewSecondAlgo;
+    static ImageView imageViewOriginal, imageViewFirstAlgo, imageViewSecondAlgo;
+    static RadioButton originalImageRadioButton, FirstAlgoRadioButton, SecondAlgoRadioButton;
     @Override
     public void start(Stage stage) {
         window = stage;
@@ -64,7 +65,7 @@ public class HelloApplication extends Application {
         });
 
         FileChooser fileChooser = new FileChooser();
-        Button uploadImageButton = new Button("Choose a photo");
+        Button uploadImageButton = new Button("Choose an image");
 
         uploadImageButton.setOnAction(e -> {
             try {
@@ -122,15 +123,40 @@ public class HelloApplication extends Application {
         imageVBox2.getChildren().addAll(label2, imageViewFirstAlgo);
         imageVBox3.getChildren().addAll(label3, imageViewSecondAlgo);
 
+        Label label = new Label("Choose an Image:");
+        // Create the radio buttons
+        originalImageRadioButton = new RadioButton("Original");
+        FirstAlgoRadioButton = new RadioButton("1st Algorithm");
+        SecondAlgoRadioButton = new RadioButton("2st Algorithm");
+
+        // Create a toggle group and add the radio buttons to it
+        ToggleGroup toggleGroupRadioButtons = new ToggleGroup();
+        originalImageRadioButton.setToggleGroup(toggleGroupRadioButtons);
+        FirstAlgoRadioButton.setToggleGroup(toggleGroupRadioButtons);
+        SecondAlgoRadioButton.setToggleGroup(toggleGroupRadioButtons);
+
+        // Select the first radio button by default
+        originalImageRadioButton.setSelected(true);
+
+        // Create a VBox to hold the label and radio buttons
+        VBox vBoxRadioButtons = new VBox(10);
+        vBoxRadioButtons.setPadding(new Insets(10));
+        vBoxRadioButtons.getChildren().addAll(originalImageRadioButton, FirstAlgoRadioButton, SecondAlgoRadioButton);
+
         HBox imagesContainer = new HBox();
         imagesContainer.setAlignment(Pos.CENTER);
         imagesContainer.getChildren().addAll(imageVBox1, separator1, imageVBox2, separator2, imageVBox3);
 
+        HBox hBox = new HBox();
+        hBox.setAlignment(Pos.CENTER);
+        hBox.setSpacing(50);
+        hBox.getChildren().addAll(label, vBoxRadioButtons, ColorPalette.colorPaletteButton(), Histogram.histogramButton());
+
         VBox appContainer = new VBox();
         appContainer.setAlignment(Pos.CENTER);
         appContainer.setPadding(new Insets(10));
-        appContainer.setSpacing(20);
-        appContainer.getChildren().addAll(chooseDirectoryButton, resultsDirectoryTextNode, uploadImageButton, imagesContainer, ColorPalette.colorPaletteButton());
+        appContainer.setSpacing(10);
+        appContainer.getChildren().addAll(chooseDirectoryButton, resultsDirectoryTextNode, uploadImageButton, imagesContainer, hBox);
 
         StackPane layout = new StackPane();
         layout.getChildren().addAll(appContainer);
@@ -138,6 +164,7 @@ public class HelloApplication extends Application {
         stage.setScene(new Scene(layout, 800, 500));
         stage.show();
     }
+
 
     public static void main(String[] args) {
         launch();

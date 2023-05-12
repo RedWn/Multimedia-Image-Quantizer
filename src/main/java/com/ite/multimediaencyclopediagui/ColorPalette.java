@@ -7,7 +7,6 @@ import javafx.scene.image.PixelReader;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -24,10 +23,16 @@ public class ColorPalette {
                 // Set the owner of the pop-up window to the primary stage
                 popupStage.initOwner(HelloApplication.window);
 
-                // Set the modality of the pop-up window
-                popupStage.initModality(Modality.WINDOW_MODAL);
-
-                Image image = HelloApplication.imageViewOriginal.getImage();
+                Image image;
+                if (HelloApplication.originalImageRadioButton.isSelected()) {
+                    image = HelloApplication.imageViewOriginal.getImage();
+                }
+                else if(HelloApplication.FirstAlgoRadioButton.isSelected()){
+                    image = HelloApplication.imageViewFirstAlgo.getImage();
+                }
+                else{
+                    image = HelloApplication.imageViewSecondAlgo.getImage();
+                }
 
                 List<Color> colors = generateColorPalette(image);
                 HBox colorBox = new HBox();

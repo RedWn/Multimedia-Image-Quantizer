@@ -1,6 +1,7 @@
 package com.ite.multimediaencyclopediagui;
 
 import com.ite.multimediaencyclopediagui.images.ImageUtils;
+import com.ite.multimediaencyclopediagui.images.LloydsAlgorithm;
 import com.ite.multimediaencyclopediagui.images.MedianCutAlgorithm;
 import com.ite.multimediaencyclopediagui.images.Pixel;
 import javafx.application.Application;
@@ -77,16 +78,22 @@ public class HelloApplication extends Application {
 
                 BufferedImage originalPicture = ImageIO.read(chosenFile);
                 Pixel[] originalPicturePixels = ImageUtils.ImageToPixels(originalPicture);
-                Pixel[] quantizedPixels = MedianCutAlgorithm.GetQuantizedPixels(originalPicturePixels, 16);
+                Pixel[] quantizedPixels = MedianCutAlgorithm.GetQuantizedPixels(originalPicturePixels, 32);
+                Pixel[] quantizedPixels2 = LloydsAlgorithm.GetQuantizedPixels(originalPicturePixels, 32);
 
                 BufferedImage bufferedQuantizedImage = ImageUtils.PixelsToImage(quantizedPixels, originalPicture);
                 Image nonBufferedQuantizedImageToMakeJavaHappy = ImageUtils.ConvertBufferedImageToImage(bufferedQuantizedImage);
 
+                BufferedImage bufferedQuantizedImage2 = ImageUtils.PixelsToImage(quantizedPixels2, originalPicture);
+                Image nonBufferedQuantizedImageToMakeJavaHappy2 = ImageUtils.ConvertBufferedImageToImage(bufferedQuantizedImage2);
+
                 String pathname = Path.of(resultsDirectory.getValue(), "new-test.jpg").toString();
+                String pathname2 = Path.of(resultsDirectory.getValue(), "new-test2.jpg").toString();
                 ImageIO.write(bufferedQuantizedImage, "jpg", new File(pathname));
+                ImageIO.write(bufferedQuantizedImage2, "jpg", new File(pathname2));
 
                 imageViewFirstAlgo.setImage(nonBufferedQuantizedImageToMakeJavaHappy);
-                imageViewSecondAlgo.setImage(nonBufferedQuantizedImageToMakeJavaHappy);
+                imageViewSecondAlgo.setImage(nonBufferedQuantizedImageToMakeJavaHappy2);
 
             } catch (Exception exception) {
                 exception.printStackTrace();

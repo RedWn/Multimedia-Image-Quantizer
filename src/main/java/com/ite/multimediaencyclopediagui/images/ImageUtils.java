@@ -43,8 +43,8 @@ public class ImageUtils {
         return ans;
     }
 
-    public static BufferedImage PixelsToImage(Pixel[] imagePixels, BufferedImage res) {
-        BufferedImage ans = new BufferedImage(res.getWidth(), res.getHeight(), res.getType());
+    public static BufferedImage PixelsToImage(Pixel[] imagePixels, int width, int height,int type) {
+        BufferedImage ans = new BufferedImage(width, height, type);
         for (Pixel pixel : imagePixels) {
             ans.setRGB(pixel.index % ans.getWidth(), pixel.index / ans.getWidth(), convertFromRGBArray(pixel.RGB));
         }

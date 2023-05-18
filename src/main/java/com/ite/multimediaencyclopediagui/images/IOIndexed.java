@@ -1,29 +1,26 @@
 package com.ite.multimediaencyclopediagui.images;
 
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.Vector;
 
 public class IOIndexed {
-    public static void writeIndexed(Pixel[] image, int width, int height, int nColors, String fileName) throws IOException {
+    public static void writeIndexed(BufferedImage BI, int nColors, String fileName) throws IOException {
         DataOutputStream dos = new DataOutputStream(new FileOutputStream(fileName));
         dos.writeShort(888);
-        dos.writeShort(width);
-        dos.writeShort(height);
+        dos.writeShort(BI.getWidth());
+        dos.writeShort(BI.getHeight());
 
         int[] colorsRepetition = new int[nColors];
         Vector<Integer> colors = new Vector<>();
-        int[] tempColors = new int[image.length];
-        for (Pixel pixel : image) {
-            int color = ImageUtils.convertFromRGBArray(pixel.RGB);
+        for (int i = 0; i < BI.getWidth()*BI.getHeight(); i++) {
+            int color = BI.getRGB(i%BI.getWidth(),i/BI.getWidth());
             if (colors.contains(color)) {
                 colorsRepetition[colors.indexOf(color)]++;
             } else {
                 colors.add(color);
             }
-            tempColors[pixel.index] = color;
-        }
-        for (int tempColor : tempColors) {
-            dos.writeByte(colors.indexOf(tempColor));
+            dos.writeByte(colors.indexOf(color));
         }
         for (Integer color : colors) {
             Pixel temp = ImageUtils.convertRGBToPixel(color);
@@ -35,17 +32,18 @@ public class IOIndexed {
         dos.writeShort(-1);
     }
 
-    public static Pixel[] readIndexed(String fileName) throws IOException {
+    public static IndexedImage readIndexed(String fileName) throws IOException {
         DataInputStream dis = new DataInputStream(new FileInputStream(fileName));
         int buffer;
         if (dis.readShort() != 888) {
-            return new Pixel[0];
+            return new IndexedImage();
         }
         int width = dis.readShort();
         int height = dis.readShort();
-        Pixel[] ans = new Pixel[width * height];
+        IndexedImage ans = new IndexedImage();
+        ans.pixels = new Pixel[width * height];
         Vector<Pixel> colors = new Vector<>();
-        dis.skipBytes(ans.length);
+        dis.skipBytes(ans.pixels.length);
         boolean getOut = false;
         while (true) {
             Pixel temp = new Pixel();
@@ -64,13 +62,15 @@ public class IOIndexed {
         }
         dis = new DataInputStream(new FileInputStream(fileName));
         dis.skipBytes(6);
-        for (int i = 0; i < ans.length; i++) {
+        for (int i = 0; i < ans.pixels.length; i++) {
             Pixel temp = new Pixel();
             temp.index = i;
             buffer = dis.readByte();
             temp.RGB = colors.elementAt(buffer).RGB;
-            ans[i] = temp;
+            ans.pixels[i] = temp;
         }
+        ans.width = width;
+        ans.height = height;
         return ans;
     }
 }

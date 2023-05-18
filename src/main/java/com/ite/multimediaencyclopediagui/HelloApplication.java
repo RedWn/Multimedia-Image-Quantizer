@@ -1,9 +1,6 @@
 package com.ite.multimediaencyclopediagui;
 
-import com.ite.multimediaencyclopediagui.images.ImageUtils;
-import com.ite.multimediaencyclopediagui.images.LloydsAlgorithm;
-import com.ite.multimediaencyclopediagui.images.MedianCutAlgorithm;
-import com.ite.multimediaencyclopediagui.images.Pixel;
+import com.ite.multimediaencyclopediagui.images.*;
 import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.geometry.*;
@@ -81,14 +78,16 @@ public class HelloApplication extends Application {
                 Pixel[] quantizedPixels = MedianCutAlgorithm.GetQuantizedPixels(originalPicturePixels, 32);
                 Pixel[] quantizedPixels2 = LloydsAlgorithm.GetQuantizedPixels(originalPicturePixels, 32);
 
-                BufferedImage bufferedQuantizedImage = ImageUtils.PixelsToImage(quantizedPixels, originalPicture);
+                BufferedImage bufferedQuantizedImage = ImageUtils.PixelsToImage(quantizedPixels, originalPicture.getWidth(),originalPicture.getHeight(),originalPicture.getType());
                 Image nonBufferedQuantizedImageToMakeJavaHappy = ImageUtils.ConvertBufferedImageToImage(bufferedQuantizedImage);
 
-                BufferedImage bufferedQuantizedImage2 = ImageUtils.PixelsToImage(quantizedPixels2, originalPicture);
+                BufferedImage bufferedQuantizedImage2 = ImageUtils.PixelsToImage(quantizedPixels2, originalPicture.getWidth(),originalPicture.getHeight(),originalPicture.getType());
                 Image nonBufferedQuantizedImageToMakeJavaHappy2 = ImageUtils.ConvertBufferedImageToImage(bufferedQuantizedImage2);
 
                 String pathname = Path.of(resultsDirectory.getValue(), "new-test.jpg").toString();
                 String pathname2 = Path.of(resultsDirectory.getValue(), "new-test2.jpg").toString();
+//                IOIndexed.writeIndexed(ImageManipulation.MatrixToImage(newImage, myPicture.getWidth(),myPicture.getHeight(),myPicture.getType()), nColors, "output2.rii");
+//                IndexedImage newImage2 = IOIndexed.readIndexed("output2.rii");
                 ImageIO.write(bufferedQuantizedImage, "jpg", new File(pathname));
                 ImageIO.write(bufferedQuantizedImage2, "jpg", new File(pathname2));
 

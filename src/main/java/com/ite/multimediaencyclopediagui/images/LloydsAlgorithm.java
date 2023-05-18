@@ -19,7 +19,7 @@ public class LloydsAlgorithm {
         while (!done) {
             done = true;
             for (int i=0;i< kGroups.length;i++) {
-                kGroups[i] = new Vector<Pixel>();
+                kGroups[i] = new Vector<>();
             }
             int group = 0;
             for (int i = 0; i < imagePixels.length; i++) {

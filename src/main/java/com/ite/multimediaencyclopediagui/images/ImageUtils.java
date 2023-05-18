@@ -10,7 +10,7 @@ import java.awt.image.DataBufferInt;
 import java.nio.IntBuffer;
 
 public class ImageUtils {
-    private static Pixel convertRGBToPixel(int rgbValue) {
+    public static Pixel convertRGBToPixel(int rgbValue) {
         String rgbHexString = Integer.toHexString(rgbValue);
         Pixel ans = new Pixel();
         for (int i = 2; i < rgbHexString.length(); i += 2) {
@@ -20,7 +20,7 @@ public class ImageUtils {
         return ans;
     }
 
-    private static int convertFromRGBArray(int[] x) {
+    public static int convertFromRGBArray(int[] x) {
         StringBuilder ans = new StringBuilder("ff");
         for (int j : x) {
             String temp = Integer.toHexString(j);

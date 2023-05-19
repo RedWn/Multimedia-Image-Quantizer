@@ -3,13 +3,21 @@ package com.ite.multimediaencyclopediagui;
 import com.ite.multimediaencyclopediagui.images.*;
 import javafx.application.Application;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.geometry.*;
-import javafx.stage.*;
-import javafx.scene.*;
+import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
+import javafx.geometry.Pos;
+import javafx.geometry.VPos;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.image.*;
-import javafx.scene.layout.*;
-import javafx.scene.text.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -18,13 +26,18 @@ import java.nio.file.Path;
 
 
 public class HelloApplication extends Application {
+    static Stage window;
+    static ImageView imageViewOriginal, imageViewFirstAlgo, imageViewSecondAlgo;
+    static RadioButton originalImageRadioButton, FirstAlgoRadioButton, SecondAlgoRadioButton;
     /**
      * Directory where images are stored after applying the algorithm.
      */
     private final SimpleStringProperty resultsDirectory = new SimpleStringProperty();
-    static Stage window;
-    static ImageView imageViewOriginal, imageViewFirstAlgo, imageViewSecondAlgo;
-    static RadioButton originalImageRadioButton, FirstAlgoRadioButton, SecondAlgoRadioButton;
+
+    public static void main(String[] args) {
+        launch();
+    }
+
     @Override
     public void start(Stage stage) {
         window = stage;
@@ -78,18 +91,19 @@ public class HelloApplication extends Application {
                 Pixel[] quantizedPixels = MedianCutAlgorithm.GetQuantizedPixels(originalPicturePixels, 32);
                 Pixel[] quantizedPixels2 = LloydsAlgorithm.GetQuantizedPixels(originalPicturePixels, 32);
 
-                BufferedImage bufferedQuantizedImage = ImageUtils.PixelsToImage(quantizedPixels, originalPicture.getWidth(),originalPicture.getHeight(),originalPicture.getType());
+                BufferedImage bufferedQuantizedImage = ImageUtils.PixelsToImage(quantizedPixels, originalPicture.getWidth(), originalPicture.getHeight(), originalPicture.getType());
                 Image nonBufferedQuantizedImageToMakeJavaHappy = ImageUtils.ConvertBufferedImageToImage(bufferedQuantizedImage);
 
-                BufferedImage bufferedQuantizedImage2 = ImageUtils.PixelsToImage(quantizedPixels2, originalPicture.getWidth(),originalPicture.getHeight(),originalPicture.getType());
+                BufferedImage bufferedQuantizedImage2 = ImageUtils.PixelsToImage(quantizedPixels2, originalPicture.getWidth(), originalPicture.getHeight(), originalPicture.getType());
                 Image nonBufferedQuantizedImageToMakeJavaHappy2 = ImageUtils.ConvertBufferedImageToImage(bufferedQuantizedImage2);
 
                 String pathname = Path.of(resultsDirectory.getValue(), "new-test.jpg").toString();
                 String pathname2 = Path.of(resultsDirectory.getValue(), "new-test2.jpg").toString();
-//                IOIndexed.writeIndexed(ImageManipulation.MatrixToImage(newImage, myPicture.getWidth(),myPicture.getHeight(),myPicture.getType()), nColors, "output2.rii");
-//                IndexedImage newImage2 = IOIndexed.readIndexed("output2.rii");
-                ImageIO.write(bufferedQuantizedImage, "jpg", new File(pathname));
-                ImageIO.write(bufferedQuantizedImage2, "jpg", new File(pathname2));
+                IOIndexed.writeIndexed(bufferedQuantizedImage, pathname);
+                IOIndexed.writeIndexed(bufferedQuantizedImage2, pathname2);
+//                IndexedImage newImage = IOIndexed.readIndexed("output.rii");
+//                ImageIO.write(bufferedQuantizedImage, "jpg", new File(pathname));
+//                ImageIO.write(bufferedQuantizedImage2, "jpg", new File(pathname2));
 
                 imageViewFirstAlgo.setImage(nonBufferedQuantizedImageToMakeJavaHappy);
                 imageViewSecondAlgo.setImage(nonBufferedQuantizedImageToMakeJavaHappy2);
@@ -98,7 +112,6 @@ public class HelloApplication extends Application {
                 exception.printStackTrace();
             }
         });
-
 
 
         Separator separator1 = new Separator();
@@ -169,10 +182,5 @@ public class HelloApplication extends Application {
 
         stage.setScene(new Scene(layout, 800, 500));
         stage.show();
-    }
-
-
-    public static void main(String[] args) {
-        launch();
     }
 }

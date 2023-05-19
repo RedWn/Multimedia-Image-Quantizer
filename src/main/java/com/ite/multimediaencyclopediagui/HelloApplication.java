@@ -101,7 +101,11 @@ public class HelloApplication extends Application {
                 String pathname2 = Path.of(resultsDirectory.getValue(), "new-test2.jpg").toString();
                 IOIndexed.writeIndexed(bufferedQuantizedImage, pathname);
                 IOIndexed.writeIndexed(bufferedQuantizedImage2, pathname2);
-//                IndexedImage newImage = IOIndexed.readIndexed("output.rii");
+
+//                IndexedImage indexed = IOIndexed.readIndexed("output.rii");
+//                BufferedImage bufferedQuantizedImageX = ImageUtils.PixelsToImage(indexed.pixels, indexed.width, indexed.height, originalPicture.getType());
+//                Image nonBufferedQuantizedImageToMakeJavaHappyX = ImageUtils.ConvertBufferedImageToImage(bufferedQuantizedImageX);
+                
 //                ImageIO.write(bufferedQuantizedImage, "jpg", new File(pathname));
 //                ImageIO.write(bufferedQuantizedImage2, "jpg", new File(pathname2));
 

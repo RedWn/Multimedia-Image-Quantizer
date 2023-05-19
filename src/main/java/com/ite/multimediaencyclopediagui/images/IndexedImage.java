@@ -1,5 +1,5 @@
 package com.ite.multimediaencyclopediagui.images;
 public class IndexedImage {
-    Pixel[] pixels;
-    int width,height;
+    public Pixel[] pixels;
+    public int width,height;
 }

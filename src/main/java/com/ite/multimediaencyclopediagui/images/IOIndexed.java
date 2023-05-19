@@ -5,13 +5,13 @@ import java.io.*;
 import java.util.Vector;
 
 public class IOIndexed {
-    public static void writeIndexed(BufferedImage BI, int nColors, String fileName) throws IOException {
+    public static void writeIndexed(BufferedImage BI, String fileName) throws IOException {
         DataOutputStream dos = new DataOutputStream(new FileOutputStream(fileName));
         dos.writeShort(888);
         dos.writeShort(BI.getWidth());
         dos.writeShort(BI.getHeight());
 
-        int[] colorsRepetition = new int[nColors];
+        int[] colorsRepetition = new int[256];
         Vector<Integer> colors = new Vector<>();
         for (int i = 0; i < BI.getWidth()*BI.getHeight(); i++) {
             int color = BI.getRGB(i%BI.getWidth(),i/BI.getWidth());

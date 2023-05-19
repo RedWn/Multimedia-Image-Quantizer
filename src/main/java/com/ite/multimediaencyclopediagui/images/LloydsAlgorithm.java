@@ -1,6 +1,7 @@
 package com.ite.multimediaencyclopediagui.images;
 
-import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 import java.util.Vector;
 
 public class LloydsAlgorithm {
@@ -9,35 +10,36 @@ public class LloydsAlgorithm {
         Vector<Pixel>[] kGroups = new Vector[nColors];
         boolean done = false;
         Pixel[] ans = new Pixel[imagePixels.length];
+        int[] avg = getGroupCenter(new Vector<>(List.of(imagePixels)));
+        Random rand = new Random();
         for (int i = 0; i < kMeans.length; i++) {
             int[] temp = new int[3];
-            for (int j=0;j<temp.length;j++){
-                temp[j] = (int) (Math.random() * 255);
+            for (int j = 0; j < temp.length; j++) {
+                temp[j] = (rand.nextInt(256) + avg[j] - 128);
             }
             kMeans[i] = temp;
         }
         while (!done) {
             done = true;
-            for (int i=0;i< kGroups.length;i++) {
+            for (int i = 0; i < kGroups.length; i++) {
                 kGroups[i] = new Vector<>();
             }
             int group = 0;
-            for (int i = 0; i < imagePixels.length; i++) {
+            for (Pixel imagePixel : imagePixels) {
                 int minD = Integer.MAX_VALUE;
                 for (int j = 0; j < nColors; j++) {
-                    if (distanceBetweenPoints(imagePixels[i].RGB, kMeans[j]) < minD) {
-                        minD = distanceBetweenPoints(imagePixels[i].RGB, kMeans[j]);
+                    if (distanceBetweenPoints(imagePixel.RGB, kMeans[j]) < minD) {
+                        minD = distanceBetweenPoints(imagePixel.RGB, kMeans[j]);
                         group = j;
                     }
                 }
-                kGroups[group].add(imagePixels[i]);
+                kGroups[group].add(imagePixel);
             }
             for (int i = 0; i < kGroups.length; i++) {
                 int[] center;
-                if (kGroups[i].size() == 0){
+                if (kGroups[i].size() == 0) {
                     center = kMeans[i];
-                }
-                else {
+                } else {
                     center = getGroupCenter(kGroups[i]);
                 }
                 if (!sameVector(center, kMeans[i])) {
@@ -58,13 +60,12 @@ public class LloydsAlgorithm {
     }
 
     public static int distanceBetweenPoints(int[] a, int[] b) {
-        int ans = (int) Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2) + Math.pow(a[2] - b[2], 2));
-        return ans;
+        return (int) Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2) + Math.pow(a[2] - b[2], 2));
     }
 
     public static int[] getGroupCenter(Vector<Pixel> group) {
         int[] ans = new int[3];
-        for (Pixel pixel:group) {
+        for (Pixel pixel : group) {
             ans[0] += pixel.RGB[0];
             ans[1] += pixel.RGB[1];
             ans[2] += pixel.RGB[2];

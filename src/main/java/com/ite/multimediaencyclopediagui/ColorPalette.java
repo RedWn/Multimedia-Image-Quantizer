@@ -24,6 +24,9 @@ public class ColorPalette {
                 popupStage.initOwner(HelloApplication.window);
 
                 Image image;
+
+                Integer numberOfColors = Integer.valueOf(HelloApplication.colorsSelectedToggle.getText());
+
                 if (HelloApplication.originalImageRadioButton.isSelected()) {
                     image = HelloApplication.imageViewOriginal.getImage();
                 }
@@ -34,7 +37,7 @@ public class ColorPalette {
                     image = HelloApplication.imageViewSecondAlgo.getImage();
                 }
 
-                List<Color> colors = generateColorPalette(image);
+                List<Color> colors = generateColorPalette(image, numberOfColors);
                 HBox colorBox = new HBox();
                 for (Color color : colors) {
                     Rectangle rectangle = new Rectangle(20, 20, color);
@@ -53,7 +56,7 @@ public class ColorPalette {
         return colorButton;
         }
 
-    private static List<Color> generateColorPalette(Image image) {
+    private static List<Color> generateColorPalette(Image image, int numberOfColors) {
         // Get the pixel reader for the image
         PixelReader pixelReader = image.getPixelReader();
 
@@ -73,7 +76,7 @@ public class ColorPalette {
         buckets.add(colors);
 
         // Subdivide the buckets until we have 16 buckets
-        while (buckets.size() < 16) {
+        while (buckets.size() < numberOfColors) {
             // Find the bucket with the greatest range in any color channel
             List<Color> bucketToDivide = null;
             double maxRange = 0;

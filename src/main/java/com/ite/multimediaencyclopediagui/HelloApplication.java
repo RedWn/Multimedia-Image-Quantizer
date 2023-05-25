@@ -25,7 +25,7 @@ import java.nio.file.Path;
 public class HelloApplication extends Application {
     static Stage window;
     static ImageView imageViewOriginal, imageViewFirstAlgo, imageViewSecondAlgo;
-    static RadioButton originalImageRadioButton, FirstAlgoRadioButton, SecondAlgoRadioButton;
+    static RadioButton originalImageRadioButton, FirstAlgoRadioButton, SecondAlgoRadioButton, colorsSelectedToggle;
     /**
      * Directory where images are stored after applying the algorithm.
      */
@@ -81,8 +81,8 @@ public class HelloApplication extends Application {
 
                 BufferedImage originalPicture = ImageIO.read(chosenFile);
                 Pixel[] originalPicturePixels = ImageUtils.ImageToPixels(originalPicture);
-                Pixel[] quantizedPixels = MedianCutAlgorithm.GetQuantizedPixels(originalPicturePixels, 32);
-                Pixel[] quantizedPixels2 = LloydsAlgorithm.GetQuantizedPixels(originalPicturePixels, 32);
+                Pixel[] quantizedPixels = MedianCutAlgorithm.GetQuantizedPixels(originalPicturePixels, Integer.valueOf(HelloApplication.colorsSelectedToggle.getText()));
+                Pixel[] quantizedPixels2 = LloydsAlgorithm.GetQuantizedPixels(originalPicturePixels, Integer.valueOf(HelloApplication.colorsSelectedToggle.getText()));
 
                 BufferedImage bufferedQuantizedImage = ImageUtils.PixelsToImage(quantizedPixels, originalPicture.getWidth(), originalPicture.getHeight(), originalPicture.getType());
                 Image nonBufferedQuantizedImageToMakeJavaHappy = ImageUtils.ConvertBufferedImageToImage(bufferedQuantizedImage);
@@ -137,11 +137,43 @@ public class HelloApplication extends Application {
             }
         });
 
+        Label colorsLabel = new Label("Choose how many colors do you want in the new image?");
+        // Create the radio buttons
+        RadioButton twoColorsRadioButton = new RadioButton("2");
+        RadioButton fourColorsRadioButton = new RadioButton("4");
+        RadioButton eightColorsRadioButton = new RadioButton("8");
+        RadioButton sixteenColorsRadioButton = new RadioButton("16");
+        RadioButton thirtyTwoColorsRadioButton = new RadioButton("32");
+        RadioButton sixtyFourColorsRadioButton = new RadioButton("64");
+
+        // Create a toggle group and add the radio buttons to it
+        ToggleGroup colorsToggleGroupRadioButtons = new ToggleGroup();
+
+        // Add a listener to the selected toggle property
+        colorsToggleGroupRadioButtons.selectedToggleProperty().addListener((observable, oldVal, newVal) -> {
+            // Get the selected radio button
+            colorsSelectedToggle = (RadioButton) colorsToggleGroupRadioButtons.getSelectedToggle();
+            System.out.println(colorsSelectedToggle.getText() + " was selected");
+        });
+        twoColorsRadioButton.setSelected(true);
+
+        twoColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
+        fourColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
+        eightColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
+        sixteenColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
+        thirtyTwoColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
+        sixtyFourColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
+
+        HBox hBoxColorsRadioButtons = new HBox(10);
+        hBoxColorsRadioButtons.setAlignment(Pos.CENTER);
+        hBoxColorsRadioButtons.getChildren().addAll(twoColorsRadioButton, fourColorsRadioButton, eightColorsRadioButton,
+                sixteenColorsRadioButton, thirtyTwoColorsRadioButton, sixtyFourColorsRadioButton);
+
         Label label = new Label("Choose an Image:");
         // Create the radio buttons
         originalImageRadioButton = new RadioButton("Original");
         FirstAlgoRadioButton = new RadioButton("1st Algorithm");
-        SecondAlgoRadioButton = new RadioButton("2ed Algorithm");
+        SecondAlgoRadioButton = new RadioButton("2nd Algorithm");
 
         // Create a toggle group and add the radio buttons to it
         ToggleGroup toggleGroupRadioButtons = new ToggleGroup();
@@ -166,7 +198,7 @@ public class HelloApplication extends Application {
         appContainer.setAlignment(Pos.CENTER);
         appContainer.setPadding(new Insets(10));
         appContainer.setSpacing(15);
-        appContainer.getChildren().addAll(chooseDirectoryButton, resultsDirectoryTextNode, uploadImageButton, hBox);
+        appContainer.getChildren().addAll(chooseDirectoryButton, resultsDirectoryTextNode, colorsLabel, hBoxColorsRadioButtons, uploadImageButton, hBox);
 
         StackPane layout = new StackPane();
         layout.getChildren().addAll(appContainer);

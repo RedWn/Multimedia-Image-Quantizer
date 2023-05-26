@@ -1,9 +1,12 @@
 package com.ite.multimediaencyclopediagui;
 
+import com.ite.multimediaencyclopediagui.images.LloydsAlgorithm;
+import com.ite.multimediaencyclopediagui.images.MedianCutAlgorithm;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -26,7 +29,6 @@ public class ColorPalette {
                 Image image;
 
                 Integer numberOfColors = Integer.valueOf(HelloApplication.colorsSelectedToggle.getText());
-
                 if (HelloApplication.originalImageRadioButton.isSelected()) {
                     image = HelloApplication.imageViewOriginal.getImage();
                 }
@@ -43,10 +45,22 @@ public class ColorPalette {
                     Rectangle rectangle = new Rectangle(20, 20, color);
                     colorBox.getChildren().add(rectangle);
                 }
+                // Create a gridpane and set its size and gaps
+                GridPane gridpane = new GridPane();
+                gridpane.setPrefSize(300, 200);
+
+                // Create n rectangles and add them to the gridpane
+                for (int i = 0; i < colors.size(); i++) {
+                    int x = (int) (i/ Math.sqrt(colors.size()));
+                    int y = (int) (i% Math.sqrt(colors.size()));
+                    Rectangle rectangle = new Rectangle(20, 20, colors.get(i));
+                    gridpane.add(rectangle, x, y);
+                }
+
                 HBox root = new HBox();
                 root.getChildren().addAll(colorBox);
 
-                Scene scene = new Scene(root, 300, 100);
+                Scene scene = new Scene(gridpane, 300, 100);
 
                 // Set the scene and show the pop-up window
                 popupStage.setTitle("Color Palette");

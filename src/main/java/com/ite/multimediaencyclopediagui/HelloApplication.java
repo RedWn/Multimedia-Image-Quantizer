@@ -145,6 +145,8 @@ public class HelloApplication extends Application {
         RadioButton sixteenColorsRadioButton = new RadioButton("16");
         RadioButton thirtyTwoColorsRadioButton = new RadioButton("32");
         RadioButton sixtyFourColorsRadioButton = new RadioButton("64");
+        RadioButton oneTwoEightColorsRadioButton = new RadioButton("128");
+        RadioButton twoFiveSixColorsRadioButton = new RadioButton("256");
 
         // Create a toggle group and add the radio buttons to it
         ToggleGroup colorsToggleGroupRadioButtons = new ToggleGroup();
@@ -153,7 +155,6 @@ public class HelloApplication extends Application {
         colorsToggleGroupRadioButtons.selectedToggleProperty().addListener((observable, oldVal, newVal) -> {
             // Get the selected radio button
             colorsSelectedToggle = (RadioButton) colorsToggleGroupRadioButtons.getSelectedToggle();
-            System.out.println(colorsSelectedToggle.getText() + " was selected");
         });
         twoColorsRadioButton.setSelected(true);
 
@@ -163,11 +164,14 @@ public class HelloApplication extends Application {
         sixteenColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
         thirtyTwoColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
         sixtyFourColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
+        oneTwoEightColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
+        twoFiveSixColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
 
         HBox hBoxColorsRadioButtons = new HBox(10);
         hBoxColorsRadioButtons.setAlignment(Pos.CENTER);
         hBoxColorsRadioButtons.getChildren().addAll(twoColorsRadioButton, fourColorsRadioButton, eightColorsRadioButton,
-                sixteenColorsRadioButton, thirtyTwoColorsRadioButton, sixtyFourColorsRadioButton);
+                sixteenColorsRadioButton, thirtyTwoColorsRadioButton, sixtyFourColorsRadioButton, oneTwoEightColorsRadioButton,
+                twoFiveSixColorsRadioButton);
 
         Label label = new Label("Choose an Image:");
         // Create the radio buttons

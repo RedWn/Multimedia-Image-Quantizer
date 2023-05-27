@@ -37,32 +37,42 @@ public class MedianCutAlgorithm {
     }
 
     private static Pixel[] sortPixelsByColor(Pixel[] imagePixels) {
-        int[] temp = new int[imagePixels.length];
-        for (int i = 0; i < imagePixels.length; i++) {
-            temp[i] = imagePixels[i].RGB[0];
-        }
-        Arrays.sort(temp);
-        int dR = temp[temp.length - 1] - temp[0];
+        int tempMin = Integer.MAX_VALUE;
+        int tempMax = Integer.MIN_VALUE;
 
-        temp = new int[imagePixels.length];
-        for (int i = 0; i < imagePixels.length; i++) {
-            temp[i] = imagePixels[i].RGB[1];
-        }
-        Arrays.sort(temp);
-        int dG = temp[temp.length - 1] - temp[0];
+        int redDifference, blueDifference, greenDifference;
 
-        temp = new int[imagePixels.length];
+        // Calculate difference between max and min components for rgb values.
         for (int i = 0; i < imagePixels.length; i++) {
-            temp[i] = imagePixels[i].RGB[2];
+            tempMax = Math.max(tempMax, imagePixels[i].RGB[0]);
+            tempMin = Math.min(tempMax, imagePixels[i].RGB[0]);
         }
-        Arrays.sort(temp);
-        int dB = temp[temp.length - 1] - temp[0];
+        redDifference = tempMax - tempMin;
 
-        int temp2 = Math.max(dR, dG);
-        temp2 = Math.max(temp2, dB);
-        if (temp2 == dB) {
+        tempMin = Integer.MAX_VALUE;
+        tempMax = Integer.MIN_VALUE;
+
+        for (int i = 0; i < imagePixels.length; i++) {
+            tempMax = Math.max(tempMax, imagePixels[i].RGB[1]);
+            tempMin = Math.min(tempMax, imagePixels[i].RGB[1]);
+        }
+        greenDifference = tempMax - tempMin;
+
+
+        for (int i = 0; i < imagePixels.length; i++) {
+            tempMax = Math.max(tempMax, imagePixels[i].RGB[2]);
+            tempMin = Math.min(tempMax, imagePixels[i].RGB[2]);
+        }
+        blueDifference = tempMax - tempMin;
+
+        // Get the max difference out of these rgb differences
+        int maxDifference = Math.max(redDifference, greenDifference);
+        maxDifference = Math.max(maxDifference, blueDifference);
+
+        // Sort original image pixels according to the color component with the max difference
+        if (maxDifference == blueDifference) {
             Arrays.sort(imagePixels, Comparator.comparingInt(o -> o.RGB[2]));
-        } else if (temp2 == dG) {
+        } else if (maxDifference == greenDifference) {
             Arrays.sort(imagePixels, Comparator.comparingInt(o -> o.RGB[1]));
         } else {
             Arrays.sort(imagePixels, Comparator.comparingInt(o -> o.RGB[0]));

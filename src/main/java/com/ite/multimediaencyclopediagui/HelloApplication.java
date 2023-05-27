@@ -24,12 +24,19 @@ import java.nio.file.Path;
 
 public class HelloApplication extends Application {
     static Stage window;
-    static ImageView imageViewOriginal, imageViewFirstAlgo, imageViewSecondAlgo;
-    static RadioButton originalImageRadioButton, FirstAlgoRadioButton, SecondAlgoRadioButton, colorsSelectedToggle;
+    static ImageView imageViewOriginal = new ImageView();
+    static ImageView imageViewFirstAlgo = new ImageView();
+    static ImageView imageViewSecondAlgo = new ImageView();
+    static RadioButton originalImageRadioButton = new RadioButton("Original");
+    static RadioButton FirstAlgoRadioButton = new RadioButton("1st Algorithm");
+    static RadioButton SecondAlgoRadioButton = new RadioButton("2nd Algorithm");
+    static RadioButton colorsSelectedToggle = new RadioButton();
+
+
     /**
      * Directory where images are stored after applying the algorithm.
      */
-    private String resultsDirectory = new String();
+    private String resultsDirectory = "D:\\";
 
     public static void main(String[] args) {
         launch();
@@ -42,38 +49,31 @@ public class HelloApplication extends Application {
 
         Image placeholderImage = new Image("default_image.png");
 
-        imageViewOriginal = new ImageView();
-        imageViewFirstAlgo = new ImageView();
-        imageViewSecondAlgo = new ImageView();
-
         imageViewOriginal.setImage(placeholderImage);
         imageViewFirstAlgo.setImage(placeholderImage);
         imageViewSecondAlgo.setImage(placeholderImage);
-
-        //hard-coded, for speedy reasons
-        resultsDirectory = "D:\\";
 
         imageViewOriginal.setPreserveRatio(true);
         imageViewFirstAlgo.setPreserveRatio(true);
         imageViewSecondAlgo.setPreserveRatio(true);
 
-        DirectoryChooser directoryChooser = new DirectoryChooser();
+        DirectoryChooser resultsDirectoryChooser = new DirectoryChooser();
         Text resultsDirectoryTextNode = new Text();
         resultsDirectoryTextNode.setText("Selected directory: " + resultsDirectory);
 
         Button chooseDirectoryButton = new Button("Choose a directory");
         chooseDirectoryButton.setOnAction(e -> {
-            File chosenDirectory = directoryChooser.showDialog(stage);
+            File chosenDirectory = resultsDirectoryChooser.showDialog(stage);
             this.resultsDirectory = chosenDirectory.toString();
             resultsDirectoryTextNode.setText("Selected directory: " + chosenDirectory);
         });
 
-        FileChooser fileChooser = new FileChooser();
+        FileChooser userImageChooser = new FileChooser();
         Button uploadImageButton = new Button("Choose an image");
 
         uploadImageButton.setOnAction(e -> {
             try {
-                File chosenFile = fileChooser.showOpenDialog(stage);
+                File chosenFile = userImageChooser.showOpenDialog(stage);
                 System.out.println(resultsDirectory);
 
                 Image image = new Image(chosenFile.toURI().toString());
@@ -81,6 +81,7 @@ public class HelloApplication extends Application {
 
                 BufferedImage originalPicture = ImageIO.read(chosenFile);
                 Pixel[] originalPicturePixels = ImageUtils.ImageToPixels(originalPicture);
+
                 Pixel[] quantizedPixels = MedianCutAlgorithm.GetQuantizedPixels(originalPicturePixels, Integer.valueOf(HelloApplication.colorsSelectedToggle.getText()));
                 Pixel[] quantizedPixels2 = LloydsAlgorithm.GetQuantizedPixels(originalPicturePixels, Integer.valueOf(HelloApplication.colorsSelectedToggle.getText()));
 
@@ -90,15 +91,13 @@ public class HelloApplication extends Application {
                 BufferedImage bufferedQuantizedImage2 = ImageUtils.PixelsToImage(quantizedPixels2, originalPicture.getWidth(), originalPicture.getHeight(), originalPicture.getType());
                 Image nonBufferedQuantizedImageToMakeJavaHappy2 = ImageUtils.ConvertBufferedImageToImage(bufferedQuantizedImage2);
 
-                String pathname = Path.of(resultsDirectory, "new-test.jpg").toString();
-                String pathname2 = Path.of(resultsDirectory, "new-test2.jpg").toString();
-                IOIndexed.writeIndexed(bufferedQuantizedImage, pathname);
-                IOIndexed.writeIndexed(bufferedQuantizedImage2, pathname2);
+                IOIndexed.writeIndexed(bufferedQuantizedImage, Path.of(resultsDirectory, "new-test.jpg").toString());
+                IOIndexed.writeIndexed(bufferedQuantizedImage2, Path.of(resultsDirectory, "new-test2.jpg").toString());
 
 //                IndexedImage indexed = IOIndexed.readIndexed("output.rii");
 //                BufferedImage bufferedQuantizedImageX = ImageUtils.PixelsToImage(indexed.pixels, indexed.width, indexed.height, originalPicture.getType());
 //                Image nonBufferedQuantizedImageToMakeJavaHappyX = ImageUtils.ConvertBufferedImageToImage(bufferedQuantizedImageX);
-                
+
 //                ImageIO.write(bufferedQuantizedImage, "jpg", new File(pathname));
 //                ImageIO.write(bufferedQuantizedImage2, "jpg", new File(pathname2));
 
@@ -126,7 +125,7 @@ public class HelloApplication extends Application {
                 VBox vBox = new VBox(10);
                 vBox.getChildren().addAll(hBoxLabels, hBox);
 
-                Scene popUpScene = new Scene(vBox,  1500, 400);
+                Scene popUpScene = new Scene(vBox, 1500, 400);
 
                 popUpStage.setTitle("Algorithms");
                 popUpStage.setScene(popUpScene);
@@ -137,7 +136,49 @@ public class HelloApplication extends Application {
             }
         });
 
-        Label colorsLabel = new Label("Choose how many colors do you want in the new image?");
+        ToggleGroup chooseAlgorithmToggleGroup = new ToggleGroup();
+        originalImageRadioButton.setToggleGroup(chooseAlgorithmToggleGroup);
+        FirstAlgoRadioButton.setToggleGroup(chooseAlgorithmToggleGroup);
+        SecondAlgoRadioButton.setToggleGroup(chooseAlgorithmToggleGroup);
+
+        originalImageRadioButton.setSelected(true);
+
+        VBox chooseAlgorithmVBox = new VBox(10);
+        chooseAlgorithmVBox.setPadding(new Insets(10));
+        chooseAlgorithmVBox.getChildren().addAll(originalImageRadioButton, FirstAlgoRadioButton, SecondAlgoRadioButton);
+
+        HBox lowerHBox = new HBox();
+        lowerHBox.setAlignment(Pos.CENTER);
+        lowerHBox.setSpacing(50);
+
+        lowerHBox.getChildren().addAll(
+                new Label("Choose an algorithm:"),
+                chooseAlgorithmVBox,
+                ColorPalette.colorPaletteButton(),
+                Histogram.histogramButton()
+        );
+
+        VBox appContainer = new VBox();
+        appContainer.setAlignment(Pos.CENTER);
+        appContainer.setPadding(new Insets(10));
+        appContainer.setSpacing(15);
+
+        appContainer.getChildren().addAll(
+                chooseDirectoryButton,
+                resultsDirectoryTextNode,
+                new Label("Choose how many colors do you want in the new image?"),
+                this.getColorRadioButtonsHBox(),
+                uploadImageButton,
+                lowerHBox);
+
+        StackPane appLayout = new StackPane();
+        appLayout.getChildren().addAll(appContainer);
+
+        stage.setScene(new Scene(appLayout, 600, 300));
+        stage.show();
+    }
+
+    private HBox getColorRadioButtonsHBox() {
         // Create the radio buttons
         RadioButton twoColorsRadioButton = new RadioButton("2");
         RadioButton fourColorsRadioButton = new RadioButton("4");
@@ -173,41 +214,6 @@ public class HelloApplication extends Application {
                 sixteenColorsRadioButton, thirtyTwoColorsRadioButton, sixtyFourColorsRadioButton, oneTwoEightColorsRadioButton,
                 twoFiveSixColorsRadioButton);
 
-        Label label = new Label("Choose an Image:");
-        // Create the radio buttons
-        originalImageRadioButton = new RadioButton("Original");
-        FirstAlgoRadioButton = new RadioButton("1st Algorithm");
-        SecondAlgoRadioButton = new RadioButton("2nd Algorithm");
-
-        // Create a toggle group and add the radio buttons to it
-        ToggleGroup toggleGroupRadioButtons = new ToggleGroup();
-        originalImageRadioButton.setToggleGroup(toggleGroupRadioButtons);
-        FirstAlgoRadioButton.setToggleGroup(toggleGroupRadioButtons);
-        SecondAlgoRadioButton.setToggleGroup(toggleGroupRadioButtons);
-
-        // Select the first radio button by default
-        originalImageRadioButton.setSelected(true);
-
-        // Create a VBox to hold the label and radio buttons
-        VBox vBoxRadioButtons = new VBox(10);
-        vBoxRadioButtons.setPadding(new Insets(10));
-        vBoxRadioButtons.getChildren().addAll(originalImageRadioButton, FirstAlgoRadioButton, SecondAlgoRadioButton);
-
-        HBox hBox = new HBox();
-        hBox.setAlignment(Pos.CENTER);
-        hBox.setSpacing(50);
-        hBox.getChildren().addAll(label, vBoxRadioButtons, ColorPalette.colorPaletteButton(), Histogram.histogramButton());
-
-        VBox appContainer = new VBox();
-        appContainer.setAlignment(Pos.CENTER);
-        appContainer.setPadding(new Insets(10));
-        appContainer.setSpacing(15);
-        appContainer.getChildren().addAll(chooseDirectoryButton, resultsDirectoryTextNode, colorsLabel, hBoxColorsRadioButtons, uploadImageButton, hBox);
-
-        StackPane layout = new StackPane();
-        layout.getChildren().addAll(appContainer);
-
-        stage.setScene(new Scene(layout, 600, 300));
-        stage.show();
+        return hBoxColorsRadioButtons;
     }
 }

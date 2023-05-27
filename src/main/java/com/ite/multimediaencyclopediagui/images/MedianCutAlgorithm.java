@@ -45,7 +45,7 @@ public class MedianCutAlgorithm {
         // Calculate difference between max and min components for rgb values.
         for (int i = 0; i < imagePixels.length; i++) {
             tempMax = Math.max(tempMax, imagePixels[i].RGB[0]);
-            tempMin = Math.min(tempMax, imagePixels[i].RGB[0]);
+            tempMin = Math.min(tempMin, imagePixels[i].RGB[0]);
         }
         redDifference = tempMax - tempMin;
 
@@ -54,14 +54,14 @@ public class MedianCutAlgorithm {
 
         for (int i = 0; i < imagePixels.length; i++) {
             tempMax = Math.max(tempMax, imagePixels[i].RGB[1]);
-            tempMin = Math.min(tempMax, imagePixels[i].RGB[1]);
+            tempMin = Math.min(tempMin, imagePixels[i].RGB[1]);
         }
         greenDifference = tempMax - tempMin;
 
 
         for (int i = 0; i < imagePixels.length; i++) {
             tempMax = Math.max(tempMax, imagePixels[i].RGB[2]);
-            tempMin = Math.min(tempMax, imagePixels[i].RGB[2]);
+            tempMin = Math.min(tempMin, imagePixels[i].RGB[2]);
         }
         blueDifference = tempMax - tempMin;
 

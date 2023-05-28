@@ -23,7 +23,7 @@ public class MedianCutAlgorithm {
         return ans;
     }
 
-    public static int[] getAverageRGB(Pixel[] imagePixels) {
+    private static int[] getAverageRGB(Pixel[] imagePixels) {
         int[] avg = new int[3];
         for (Pixel pixel : imagePixels) {
             avg[0] += pixel.RGB[0];

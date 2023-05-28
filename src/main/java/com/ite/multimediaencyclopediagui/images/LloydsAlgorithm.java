@@ -59,11 +59,11 @@ public class LloydsAlgorithm {
         return ans;
     }
 
-    public static int distanceBetweenPoints(int[] a, int[] b) {
+    private static int distanceBetweenPoints(int[] a, int[] b) {
         return (int) Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2) + Math.pow(a[2] - b[2], 2));
     }
 
-    public static int[] getGroupCenter(Vector<Pixel> group) {
+    private static int[] getGroupCenter(Vector<Pixel> group) {
         int[] ans = new int[3];
         for (Pixel pixel : group) {
             ans[0] += pixel.RGB[0];
@@ -76,7 +76,7 @@ public class LloydsAlgorithm {
         return ans;
     }
 
-    public static boolean sameVector(int[] a, int[] b) {
+    private static boolean sameVector(int[] a, int[] b) {
         return a[0] == b[0] && a[1] == b[1] && a[2] == b[2];
     }
 }

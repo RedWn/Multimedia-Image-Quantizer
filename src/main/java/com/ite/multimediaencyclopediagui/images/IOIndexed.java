@@ -27,11 +27,12 @@ public class IOIndexed {
             dos.writeShort(temp.RGB[0]);
             dos.writeShort(temp.RGB[1]);
             dos.writeShort(temp.RGB[2]);
-            dos.writeShort(colorsRepetition[colors.indexOf(color)]);
+            dos.writeFloat((float) (colorsRepetition[colors.indexOf(color)])/(BI.getWidth()*BI.getHeight()));
         }
         dos.writeShort(-1);
     }
 
+    //probably deprecated
     public static IndexedImage readIndexed(String fileName) throws IOException {
         DataInputStream dis = new DataInputStream(new FileInputStream(fileName));
         int buffer;
@@ -58,7 +59,7 @@ public class IOIndexed {
             if (getOut)
                 break;
             colors.add(temp);
-            dis.readShort();
+            dis.readFloat();
         }
         dis = new DataInputStream(new FileInputStream(fileName));
         dis.skipBytes(6);
@@ -71,6 +72,58 @@ public class IOIndexed {
         }
         ans.width = width;
         ans.height = height;
+        return ans;
+    }
+
+    public static IndexedImage readIndexedWithPercentages(String fileName) throws IOException {
+        DataInputStream dis = new DataInputStream(new FileInputStream(fileName));
+        int buffer;
+        if (dis.readShort() != 888) {
+            return new IndexedImage();
+        }
+        int width = dis.readShort();
+        int height = dis.readShort();
+
+        IndexedImage ans = new IndexedImage();
+        ans.pixels = new Pixel[width * height];
+        Vector<Pixel> colors = new Vector<>();
+        Vector<Float> percentages = new Vector<>();
+        dis.skipBytes(ans.pixels.length);
+        boolean getOut = false;
+        while (true) {
+            Pixel temp = new Pixel();
+            for (int j = 0; j < 3; j++) {
+                buffer = dis.readShort();
+                if (buffer == -1) {
+                    getOut = true;
+                    break;
+                }
+                temp.RGB[j] = buffer;
+            }
+            if (getOut)
+                break;
+            colors.add(temp);
+            percentages.add(dis.readFloat());
+        }
+        dis = new DataInputStream(new FileInputStream(fileName));
+        dis.skipBytes(6);
+        for (int i = 0; i < ans.pixels.length; i++) {
+            Pixel temp = new Pixel();
+            temp.index = i;
+            buffer = dis.readByte();
+            temp.RGB = colors.elementAt(buffer).RGB;
+            ans.pixels[i] = temp;
+        }
+        ans.width = width;
+        ans.height = height;
+        ans.colors = new Pixel[colors.size()];
+        for (int i=0;i<colors.size();i++){
+            ans.colors[i] = colors.elementAt(i);
+        }
+        ans.colorPercentage = new Float[percentages.size()];
+        for (int i=0;i<percentages.size();i++){
+            ans.colorPercentage[i] = percentages.elementAt(i);
+        }
         return ans;
     }
 }

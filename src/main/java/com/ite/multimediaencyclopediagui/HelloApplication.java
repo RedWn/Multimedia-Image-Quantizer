@@ -101,6 +101,13 @@ public class HelloApplication extends Application {
 //                ImageIO.write(bufferedQuantizedImage, "jpg", new File(pathname));
 //                ImageIO.write(bufferedQuantizedImage2, "jpg", new File(pathname2));
 
+
+//                 HOW TO SEARCH?
+//                 first, set the picture you want to search for its lookalikes like this
+//                 Searcher.setTarget("filepath", number of colors);
+//                 second, start the search with this call
+//                 File[] foundFiles = Searcher.Search("directory");
+
                 imageViewFirstAlgo.setImage(nonBufferedQuantizedImageToMakeJavaHappy);
                 imageViewSecondAlgo.setImage(nonBufferedQuantizedImageToMakeJavaHappy2);
 

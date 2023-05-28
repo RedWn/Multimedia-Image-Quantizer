@@ -34,8 +34,8 @@ public class ImageManipulation {
         return ans;
     }
 
-    public static BufferedImage MatrixToImage(Pixel[] image, BufferedImage res) {
-        BufferedImage ans = new BufferedImage(res.getWidth(), res.getHeight(), res.getType());
+    public static BufferedImage MatrixToImage(Pixel[] image, int width, int height,int type) {
+        BufferedImage ans = new BufferedImage(width, height,type);
         for (Pixel pixel : image) {
             ans.setRGB(pixel.index % ans.getWidth(), pixel.index / ans.getWidth(), convertFromRGBArray(pixel.RGB));
         }

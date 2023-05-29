@@ -4,7 +4,6 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Vector;
@@ -64,7 +63,7 @@ public class Searcher {
         }
         for (SearchColor searchColor : Searcher.colors) {
             for (Pixel color : colors) {
-                if (areColorsClose(RGBtoCIELAB(searchColor.RGB), RGBtoCIELAB(color.RGB))) {
+                if (areColorsClose(ImageUtils.RGBtoCIELAB(searchColor.RGB), ImageUtils.RGBtoCIELAB(color.RGB))) {
                     if (arePercentagesClose(searchColor.percentage, getAllSimilarColorsPercentages(colors,percentages,colors.indexOf(color))))
                         locks--;
                 }
@@ -89,7 +88,7 @@ public class Searcher {
     static float getAllSimilarColorsPercentages(Vector<Pixel> colors,Vector<Float> percentages,int index){
         float ans = 0;
         for (int i=0;i<colors.size();i++) {
-            if (areColorsClose(RGBtoCIELAB(colors.elementAt(i).RGB),RGBtoCIELAB(colors.elementAt(index).RGB),5))
+            if (areColorsClose(ImageUtils.RGBtoCIELAB(colors.elementAt(i).RGB),ImageUtils.RGBtoCIELAB(colors.elementAt(index).RGB),5))
                 ans += percentages.elementAt(i);
         }
         return ans;
@@ -121,49 +120,5 @@ public class Searcher {
         for (int index : taken) {
             colors.add(new SearchColor(II.colors[index].RGB, getAllSimilarColorsPercentages(temp,temp2,index)));
         }
-    }
-
-    static double[] RGBtoCIELAB(int[] RGB) {
-        double[] xyz = new double[3];
-        double[] ans = new double[3];
-        double[][] M = {
-                {0.412456, 0.357576, 0.180437},
-                {0.212673, 0.715152, 0.072175},
-                {0.019334, 0.119193, 0.950304}
-        };
-
-        for (int i = 0; i < 3; i++) {
-            xyz[i] = (float) RGB[i] / 255;
-            if (xyz[i] < 0.04045)
-                xyz[i] /= xyz[i];
-            else
-                xyz[i] = Math.pow((xyz[i] + 0.055) / 1.055, 2.4);
-        }
-        xyz = multiplyMatrices(M, xyz);
-
-        ans[0] = 116 * f(xyz[1] / 100) - 16;
-        ans[1] = 500 * (f(xyz[0] / 95.0489) - f(xyz[1] / 100));
-        ans[2] = 200 * (f(xyz[1] / 100) - f(xyz[2] / 108.884));
-
-        return ans;
-    }
-
-    static double f(double t) {
-        if (t > 0.008856)
-            return Math.pow(t, 1f / 3f);
-        else
-            return 7.787 * t + 16f / 116;
-    }
-
-    static double[] multiplyMatrices(double[][] a, double[] b) {
-        int rowsInA = a.length;
-        int columnsInA = a[0].length;
-        double[] result = new double[rowsInA];
-        for (int i = 0; i < rowsInA; i++) {
-            for (int k = 0; k < columnsInA; k++) {
-                result[i] += a[i][k] * b[k];
-            }
-        }
-        return result;
     }
 }

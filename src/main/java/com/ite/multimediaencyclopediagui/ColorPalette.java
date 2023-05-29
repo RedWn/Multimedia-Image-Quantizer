@@ -1,7 +1,5 @@
 package com.ite.multimediaencyclopediagui;
 
-import com.ite.multimediaencyclopediagui.images.LloydsAlgorithm;
-import com.ite.multimediaencyclopediagui.images.MedianCutAlgorithm;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;

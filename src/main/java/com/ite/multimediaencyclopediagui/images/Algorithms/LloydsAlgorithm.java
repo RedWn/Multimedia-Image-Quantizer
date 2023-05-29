@@ -1,4 +1,6 @@
-package com.ite.multimediaencyclopediagui.images;
+package com.ite.multimediaencyclopediagui.images.Algorithms;
+
+import com.ite.multimediaencyclopediagui.images.Pixel;
 
 import java.util.List;
 import java.util.Random;

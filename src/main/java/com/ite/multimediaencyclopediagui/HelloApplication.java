@@ -1,6 +1,8 @@
 package com.ite.multimediaencyclopediagui;
 
 import com.ite.multimediaencyclopediagui.images.*;
+import com.ite.multimediaencyclopediagui.images.Algorithms.LloydsAlgorithm;
+import com.ite.multimediaencyclopediagui.images.Algorithms.MedianCutAlgorithm;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -31,7 +33,6 @@ public class HelloApplication extends Application {
     static RadioButton FirstAlgoRadioButton = new RadioButton("1st Algorithm");
     static RadioButton SecondAlgoRadioButton = new RadioButton("2nd Algorithm");
     static RadioButton colorsSelectedToggle = new RadioButton();
-
 
     /**
      * Directory where images are stored after applying the algorithm.

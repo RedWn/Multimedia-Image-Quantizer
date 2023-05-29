@@ -38,6 +38,8 @@ public class HelloApplication extends Application {
      * Directory where images are stored after applying the algorithm.
      */
     private String resultsDirectory = "D:\\";
+    private Scene searchScene;
+    private Scene mainAlgorithmScene;
 
     public static void main(String[] args) {
         launch();
@@ -47,6 +49,8 @@ public class HelloApplication extends Application {
     public void start(Stage stage) {
         window = stage;
         window.setTitle("Multimedia Project");
+        window.setMinWidth(1000);
+        window.setMinHeight(500);
 
         Image placeholderImage = new Image("default_image.png");
 
@@ -59,14 +63,18 @@ public class HelloApplication extends Application {
         imageViewSecondAlgo.setPreserveRatio(true);
 
         DirectoryChooser resultsDirectoryChooser = new DirectoryChooser();
-        Text resultsDirectoryTextNode = new Text();
-        resultsDirectoryTextNode.setText("Selected directory: " + resultsDirectory);
 
-        Button chooseDirectoryButton = new Button("Choose a directory");
+        Text resultsDirectoryTextNode = new Text();
+        resultsDirectoryTextNode.setText(resultsDirectory);
+
+        Button chooseDirectoryButton = new Button("Change directory:");
         chooseDirectoryButton.setOnAction(e -> {
             File chosenDirectory = resultsDirectoryChooser.showDialog(stage);
-            this.resultsDirectory = chosenDirectory.toString();
-            resultsDirectoryTextNode.setText("Selected directory: " + chosenDirectory);
+            if (chosenDirectory != null) {
+                this.resultsDirectory = chosenDirectory.toString();
+                resultsDirectoryTextNode.setText(chosenDirectory.toString());
+            }
+
         });
 
         FileChooser userImageChooser = new FileChooser();
@@ -75,7 +83,6 @@ public class HelloApplication extends Application {
         uploadImageButton.setOnAction(e -> {
             try {
                 File chosenFile = userImageChooser.showOpenDialog(stage);
-                System.out.println(resultsDirectory);
 
                 Image image = new Image(chosenFile.toURI().toString());
                 imageViewOriginal.setImage(image);
@@ -166,23 +173,57 @@ public class HelloApplication extends Application {
                 Histogram.histogramButton()
         );
 
-        VBox appContainer = new VBox();
-        appContainer.setAlignment(Pos.CENTER);
-        appContainer.setPadding(new Insets(10));
-        appContainer.setSpacing(15);
+        VBox mainAlgorithmSceneContainer = new VBox();
+        mainAlgorithmSceneContainer.setAlignment(Pos.CENTER);
+        mainAlgorithmSceneContainer.setPadding(new Insets(10));
+        mainAlgorithmSceneContainer.setSpacing(15);
 
-        appContainer.getChildren().addAll(
-                chooseDirectoryButton,
-                resultsDirectoryTextNode,
+        HBox directoryBox = new HBox();
+        directoryBox.setAlignment(Pos.CENTER);
+        directoryBox.setSpacing(10);
+        directoryBox.getChildren().addAll(chooseDirectoryButton, resultsDirectoryTextNode);
+
+        Button gotoSearchScene = new Button("Search for images");
+        gotoSearchScene.setOnAction(e -> {
+            stage.setScene(searchScene);
+        });
+
+        mainAlgorithmSceneContainer.getChildren().addAll(
+                directoryBox,
                 new Label("Choose how many colors do you want in the new image?"),
                 this.getColorRadioButtonsHBox(),
                 uploadImageButton,
-                lowerHBox);
+                lowerHBox,
+                gotoSearchScene
+        );
 
-        StackPane appLayout = new StackPane();
-        appLayout.getChildren().addAll(appContainer);
+        StackPane mainAlgorithmLayout = new StackPane();
+        mainAlgorithmLayout.getChildren().addAll(mainAlgorithmSceneContainer);
 
-        stage.setScene(new Scene(appLayout, 600, 300));
+        // Search scene
+        Button gotoMainAlgorithmScene = new Button("Go Back");
+        gotoMainAlgorithmScene.setOnAction(e -> {
+            stage.setScene(mainAlgorithmScene);
+        });
+
+        Button uploadSearchImage = new Button("Choose an image to search for");
+        uploadImageButton.setOnAction(e -> {
+            File chosenFile = userImageChooser.showOpenDialog(stage);
+
+        });
+
+        VBox searchSceneContainer = new VBox();
+        searchSceneContainer.setAlignment(Pos.CENTER);
+        searchSceneContainer.setSpacing(15);
+        searchSceneContainer.getChildren().addAll(new Label("Search scene"),uploadSearchImage, gotoMainAlgorithmScene);
+
+        StackPane searchLayout = new StackPane();
+        searchLayout.getChildren().addAll(searchSceneContainer);
+
+        mainAlgorithmScene = new Scene(mainAlgorithmLayout, 1000, 500);
+        searchScene = new Scene(searchLayout, 1000, 500);
+
+        stage.setScene(mainAlgorithmScene);
         stage.show();
     }
 

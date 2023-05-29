@@ -174,6 +174,7 @@ public class IOIndexed {
             int colorIndex = sourceImageData.readByte();
 
             temp.index = i; // TODO: Why? Shouldn't this be temp.index = colorIndex ?
+            //this is the index of the pixel in the context of the image
             temp.RGB = colorsMap.elementAt(colorIndex).RGB;
 
             finalImage.pixels[i] = temp;

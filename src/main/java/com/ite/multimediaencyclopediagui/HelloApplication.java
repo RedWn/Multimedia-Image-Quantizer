@@ -4,6 +4,7 @@ import com.ite.multimediaencyclopediagui.images.Algorithms.LloydsAlgorithm;
 import com.ite.multimediaencyclopediagui.images.Algorithms.MedianCutAlgorithm;
 import com.ite.multimediaencyclopediagui.images.*;
 import javafx.application.Application;
+import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -39,6 +40,7 @@ public class HelloApplication extends Application {
 
     private DirectoryChooser directoryChooser = new DirectoryChooser();
     private FileChooser fileChooser = new FileChooser();
+    private Label searchResultsLabel;
     private final Scene mainAlgorithmScene = this.getMainAlgorithmScene();
     private final Scene searchScene = this.getSearchScene();
 
@@ -202,7 +204,7 @@ public class HelloApplication extends Application {
         int MAX_GRIDPANE_COLUMNS = 4;
         int MAX_GRIDPANE_ROWS = 4;
 
-        Label searchResultsLabel = new Label();
+        searchResultsLabel = new Label();
         searchResultsLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: 700;");
 
         uploadSearchImageButton.setOnAction(e -> {
@@ -259,10 +261,10 @@ public class HelloApplication extends Application {
 
         Button chooseSearchDirectoriesButton = new Button("Select search directories");
         chooseSearchDirectoriesButton.setOnAction(e -> {
-            File file = directoryChooser.showDialog(window);
-            if (file == null) return;
+            File searchDirFile = directoryChooser.showDialog(window);
+            if (searchDirFile == null) return;
 
-            chosenSearchDirectories.add(file);
+            chosenSearchDirectories.add(searchDirFile);
             StringBuilder chosenSearchDirectoriesString = new StringBuilder();
             chosenSearchDirectories.forEach(directory -> {
                 chosenSearchDirectoriesString
@@ -276,7 +278,7 @@ public class HelloApplication extends Application {
         VBox searchSceneContainer = new VBox();
         searchSceneContainer.setAlignment(Pos.CENTER);
         searchSceneContainer.setSpacing(15);
-        searchSceneContainer.getChildren().addAll(chooseSearchDirectoriesButton, chosenSearchDirectoriesTextNode, uploadSearchImageButton, searchResultsLabel, searchResultsGridPane, gotoMainAlgorithmScene);
+        searchSceneContainer.getChildren().addAll(chooseSearchDirectoriesButton, chosenSearchDirectoriesTextNode, uploadSearchImageButton, loading(chosenSearchDirectories), searchResultsLabel, searchResultsGridPane, gotoMainAlgorithmScene);
 
         ScrollPane searchScrollPane = new ScrollPane();
         searchScrollPane.setFitToWidth(true);
@@ -346,5 +348,75 @@ public class HelloApplication extends Application {
 
         return hBoxColorsRadioButtons;
     }
+    VBox loading(Vector<File> chosenSearchDirectories){
+        // Create a progress bar and a progress indicator
+        ProgressBar pb = new ProgressBar();
+        ProgressIndicator pi = new ProgressIndicator();
 
+        // Create a label to show the status of the task
+        Label statusLabel = new Label("Status: ");
+
+        // Create a task that simulates some work
+        Task<Void> task = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                // Update the progress and the message every second
+                int numberOfFiles = numberOfFilesInDir(chosenSearchDirectories.firstElement().toString());
+                while(Searcher.loadingNumber < numberOfFiles) {
+                    updateProgress(Searcher.loadingNumber + 1, numberOfFiles);
+                    updateMessage("Working... (" + (Searcher.loadingNumber + 1) + "/" + numberOfFiles + ")");
+                    Thread.sleep(500);
+                }
+                // Update the message when the task is done
+                updateMessage("Done!");
+                return null;
+            }
+        };
+
+        // Bind the progress property of the controls to the progress property of the task
+        pb.progressProperty().bind(task.progressProperty());
+        pi.progressProperty().bind(task.progressProperty());
+
+        // Bind the text property of the label to the message property of the task
+        statusLabel.textProperty().bind(task.messageProperty());
+
+        HBox hb = new HBox();
+        hb.setSpacing(10);
+        hb.setAlignment(Pos.CENTER);
+        hb.getChildren().addAll(pb, pi);
+
+        VBox vb = new VBox();
+        vb.setSpacing(10);
+        vb.setAlignment(Pos.CENTER);
+        vb.getChildren().addAll(hb, statusLabel);
+        if(searchResultsLabel.toString() != "Loading..."){
+            vb.setVisible(false);
+        }
+        searchResultsLabel.textProperty().addListener((observable, oldValue, newValue) -> {
+            // Do something when the label text changes
+            if(newValue == "Loading...") {
+                new Thread(task).start();
+                vb.setVisible(true);
+            }
+        });
+        return vb;
+    }
+    int numberOfFilesInDir(String dir){
+        // Create a File object for the directory
+        File fileDir = new File(dir);
+
+        // Get an array of File objects for the files and directories in the directory
+        File[] filesInDir = fileDir.listFiles();
+
+        // Initialize a counter for the number of files
+        int numFiles = 0;
+
+        // Loop through the array and increment the counter if it is a file
+        for (File file : filesInDir) {
+            if (file.isFile()) {
+                numFiles++;
+            }
+        }
+        return numFiles;
+    }
 }

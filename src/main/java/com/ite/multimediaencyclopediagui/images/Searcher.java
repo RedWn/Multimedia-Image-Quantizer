@@ -14,6 +14,7 @@ public class Searcher {
     public static float colorThreshold = 5f;
     public static float percentageThreshold = 0.005f;
     static Vector<SearchColor> colors;
+    public static int loadingNumber = 0;
 
     public static File[] Search(String directory) throws IOException {
         File FF = new File(directory);
@@ -26,6 +27,7 @@ public class Searcher {
                         ans.add(F);
                     }
                 }
+                loadingNumber++;
             }
         }
         File[] ansArray = new File[ans.size()];

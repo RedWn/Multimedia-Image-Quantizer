@@ -20,10 +20,10 @@ public class Histogram {
             Stage popupStage = new Stage();
 
             Image image;
-            if (HelloApplication.originalImageRadioButton.isSelected()) {
+            if (HelloApplication.algorithmSelectedToggle.getText() =="Original") {
                 image = HelloApplication.imageViewOriginal.getImage();
             }
-            else if(HelloApplication.FirstAlgoRadioButton.isSelected()){
+            else if(HelloApplication.algorithmSelectedToggle.getText() =="1st Algorithm"){
                 image = HelloApplication.imageViewFirstAlgo.getImage();
             }
             else{

@@ -29,10 +29,8 @@ public class HelloApplication extends Application {
     static ImageView imageViewOriginal = new ImageView();
     static ImageView imageViewFirstAlgo = new ImageView();
     static ImageView imageViewSecondAlgo = new ImageView();
-    static RadioButton originalImageRadioButton = new RadioButton("Original");
-    static RadioButton FirstAlgoRadioButton = new RadioButton("1st Algorithm");
-    static RadioButton SecondAlgoRadioButton = new RadioButton("2nd Algorithm");
     static RadioButton colorsSelectedToggle = new RadioButton();
+    static RadioButton algorithmSelectedToggle = new RadioButton();
 
     /**
      * Directory where images are stored after applying the algorithm.
@@ -133,8 +131,8 @@ public class HelloApplication extends Application {
                 BufferedImage originalPicture = ImageIO.read(chosenFile);
                 Pixel[] originalPicturePixels = ImageUtils.ImageToPixels(originalPicture);
 
-                Pixel[] quantizedPixels = MedianCutAlgorithm.GetQuantizedPixels(originalPicturePixels, Integer.valueOf(HelloApplication.colorsSelectedToggle.getText()));
-                Pixel[] quantizedPixels2 = LloydsAlgorithm.GetQuantizedPixels(originalPicturePixels, Integer.valueOf(HelloApplication.colorsSelectedToggle.getText()));
+                Pixel[] quantizedPixels = MedianCutAlgorithm.GetQuantizedPixels(originalPicturePixels, Integer.valueOf(colorsSelectedToggle.getText()));
+                Pixel[] quantizedPixels2 = LloydsAlgorithm.GetQuantizedPixels(originalPicturePixels, Integer.valueOf(colorsSelectedToggle.getText()));
 
                 BufferedImage bufferedQuantizedImage = ImageUtils.PixelsToImage(quantizedPixels, originalPicture.getWidth(), originalPicture.getHeight(), originalPicture.getType());
                 Image nonBufferedQuantizedImageToMakeJavaHappy = ImageUtils.ConvertBufferedImageToImage(bufferedQuantizedImage);
@@ -169,7 +167,7 @@ public class HelloApplication extends Application {
                 VBox vBox = new VBox(10);
                 vBox.getChildren().addAll(hBoxLabels, hBox);
 
-                Scene popUpScene = new Scene(vBox, 1500, 400);
+                Scene popUpScene = new Scene(vBox, 1500, 600);
 
                 popUpStage.setTitle("Algorithms");
                 popUpStage.setScene(popUpScene);
@@ -181,9 +179,19 @@ public class HelloApplication extends Application {
         });
 
         ToggleGroup chooseAlgorithmToggleGroup = new ToggleGroup();
+        RadioButton originalImageRadioButton = new RadioButton("Original");
+        RadioButton FirstAlgoRadioButton = new RadioButton("1st Algorithm");
+        RadioButton SecondAlgoRadioButton = new RadioButton("2nd Algorithm");
+
         originalImageRadioButton.setToggleGroup(chooseAlgorithmToggleGroup);
         FirstAlgoRadioButton.setToggleGroup(chooseAlgorithmToggleGroup);
         SecondAlgoRadioButton.setToggleGroup(chooseAlgorithmToggleGroup);
+
+        // Add a listener to the selected toggle property
+        chooseAlgorithmToggleGroup.selectedToggleProperty().addListener((observable, oldVal, newVal) -> {
+            // Get the selected radio button
+            algorithmSelectedToggle = (RadioButton) chooseAlgorithmToggleGroup.getSelectedToggle();
+        });
 
         originalImageRadioButton.setSelected(true);
 

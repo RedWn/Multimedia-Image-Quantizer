@@ -50,7 +50,7 @@ public class IOIndexed {
                 incrementalColorIndex++;
             }
 
-            dos.writeByte(colorsMap.get(colorRGBValue));
+            dos.writeShort(colorsMap.get(colorRGBValue));
         }
 
         colorsMap.forEach((colorRGBValue, colorIndexInMap) -> {
@@ -69,6 +69,7 @@ public class IOIndexed {
         });
 
         dos.writeShort(END_OF_FILE_MARKER);
+        dos.close();
     }
 
     public static IndexedImage readIndexedImageFromDisk(String fileName) throws IOException {
@@ -116,6 +117,7 @@ public class IOIndexed {
             colorPercentageMap.add(colorPercentage);
         }
 
+        sourceImageData.close();
 
         // Skip special marker + width + height and reach for color indices
         sourceImageDataForSecondPass.skipBytes(6);
@@ -124,9 +126,8 @@ public class IOIndexed {
             Pixel temp = new Pixel();
             temp.index = i; //this is the index of the pixel in the context of the image
 
-            int colorIndex = sourceImageDataForSecondPass.readByte();
+            int colorIndex = sourceImageDataForSecondPass.readShort();
             temp.RGB = colorsMap.elementAt(colorIndex).RGB;
-
             finalImage.pixels[i] = temp;
         }
 

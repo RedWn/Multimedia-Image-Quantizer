@@ -31,6 +31,17 @@ public class ImageUtils {
     }
 
     public static int convertRGBArrayToValue(int[] rgbArray) {
+//        StringBuilder ans = new StringBuilder("ff");
+//        for (int j : rgbArray) {
+//            String temp = Integer.toHexString(j);
+//            if (temp.length() < 2) {
+//                ans.append("0").append(temp);
+//            } else {
+//                ans.append(temp);
+//            }
+//        }
+//        return (int) Long.parseLong(ans.toString(), 16);
+
         return new Color(rgbArray[0], rgbArray[1], rgbArray[2]).getRGB();
     }
 

@@ -229,7 +229,7 @@ public class HelloApplication extends Application {
                 gotoSearchScene
         );
 
-        Image bg = new Image("BG2.jpg", 1000, 500, false, true);
+        Image bg = new Image("BG3.jpg", 1000, 500, false, true);
         ImageView imageView = new ImageView(bg);
 
         StackPane root = new StackPane();

@@ -46,7 +46,6 @@ public class HelloApplication extends Application {
         launch();
     }
 
-
     @Override
     public void start(Stage stage) {
         window = stage;
@@ -57,44 +56,6 @@ public class HelloApplication extends Application {
         stage.setScene(mainAlgorithmScene);
         stage.show();
     }
-
-    private HBox getColorRadioButtonsHBox() {
-        RadioButton twoColorsRadioButton = new RadioButton("2");
-        RadioButton fourColorsRadioButton = new RadioButton("4");
-        RadioButton eightColorsRadioButton = new RadioButton("8");
-        RadioButton sixteenColorsRadioButton = new RadioButton("16");
-        RadioButton thirtyTwoColorsRadioButton = new RadioButton("32");
-        RadioButton sixtyFourColorsRadioButton = new RadioButton("64");
-        RadioButton oneTwoEightColorsRadioButton = new RadioButton("128");
-        RadioButton twoFiveSixColorsRadioButton = new RadioButton("256");
-
-        ToggleGroup colorsToggleGroupRadioButtons = new ToggleGroup();
-
-        // Add a listener to the selected toggle property
-        colorsToggleGroupRadioButtons.selectedToggleProperty().addListener((observable, oldVal, newVal) -> {
-            // Get the selected radio button
-            colorsSelectedToggle = (RadioButton) colorsToggleGroupRadioButtons.getSelectedToggle();
-        });
-        twoColorsRadioButton.setSelected(true);
-
-        twoColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
-        fourColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
-        eightColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
-        sixteenColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
-        thirtyTwoColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
-        sixtyFourColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
-        oneTwoEightColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
-        twoFiveSixColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
-
-        HBox hBoxColorsRadioButtons = new HBox(10);
-        hBoxColorsRadioButtons.setAlignment(Pos.CENTER);
-        hBoxColorsRadioButtons.getChildren().addAll(twoColorsRadioButton, fourColorsRadioButton, eightColorsRadioButton,
-                sixteenColorsRadioButton, thirtyTwoColorsRadioButton, sixtyFourColorsRadioButton, oneTwoEightColorsRadioButton,
-                twoFiveSixColorsRadioButton);
-
-        return hBoxColorsRadioButtons;
-    }
-
     private Scene getMainAlgorithmScene() {
         Image placeholderImage = new Image("default_image.png");
 
@@ -178,34 +139,13 @@ public class HelloApplication extends Application {
             }
         });
 
-        ToggleGroup chooseAlgorithmToggleGroup = new ToggleGroup();
-        RadioButton originalImageRadioButton = new RadioButton("Original");
-        RadioButton FirstAlgoRadioButton = new RadioButton("1st Algorithm");
-        RadioButton SecondAlgoRadioButton = new RadioButton("2nd Algorithm");
-
-        originalImageRadioButton.setToggleGroup(chooseAlgorithmToggleGroup);
-        FirstAlgoRadioButton.setToggleGroup(chooseAlgorithmToggleGroup);
-        SecondAlgoRadioButton.setToggleGroup(chooseAlgorithmToggleGroup);
-
-        // Add a listener to the selected toggle property
-        chooseAlgorithmToggleGroup.selectedToggleProperty().addListener((observable, oldVal, newVal) -> {
-            // Get the selected radio button
-            algorithmSelectedToggle = (RadioButton) chooseAlgorithmToggleGroup.getSelectedToggle();
-        });
-
-        originalImageRadioButton.setSelected(true);
-
-        VBox chooseAlgorithmVBox = new VBox(10);
-        chooseAlgorithmVBox.setPadding(new Insets(10));
-        chooseAlgorithmVBox.getChildren().addAll(originalImageRadioButton, FirstAlgoRadioButton, SecondAlgoRadioButton);
-
         HBox lowerHBox = new HBox();
         lowerHBox.setAlignment(Pos.CENTER);
         lowerHBox.setSpacing(50);
 
         lowerHBox.getChildren().addAll(
                 new Label("Choose an algorithm:"),
-                chooseAlgorithmVBox,
+                chooseAlgorithmVBox(),
                 ColorPalette.colorPaletteButton(),
                 Histogram.histogramButton()
         );
@@ -314,7 +254,6 @@ public class HelloApplication extends Application {
             }
         });
 
-
         Vector<File> chosenSearchDirectories = new Vector();
         Text chosenSearchDirectoriesTextNode = new Text();
 
@@ -334,7 +273,6 @@ public class HelloApplication extends Application {
             chosenSearchDirectoriesTextNode.setText(chosenSearchDirectoriesString.toString());
         });
 
-
         VBox searchSceneContainer = new VBox();
         searchSceneContainer.setAlignment(Pos.CENTER);
         searchSceneContainer.setSpacing(15);
@@ -348,4 +286,65 @@ public class HelloApplication extends Application {
 
         return new Scene(searchScrollPane, 1000, 500);
     }
+    VBox chooseAlgorithmVBox(){
+        ToggleGroup chooseAlgorithmToggleGroup = new ToggleGroup();
+        RadioButton originalImageRadioButton = new RadioButton("Original");
+        RadioButton FirstAlgoRadioButton = new RadioButton("1st Algorithm");
+        RadioButton SecondAlgoRadioButton = new RadioButton("2nd Algorithm");
+
+        originalImageRadioButton.setToggleGroup(chooseAlgorithmToggleGroup);
+        FirstAlgoRadioButton.setToggleGroup(chooseAlgorithmToggleGroup);
+        SecondAlgoRadioButton.setToggleGroup(chooseAlgorithmToggleGroup);
+
+        // Add a listener to the selected toggle property
+        chooseAlgorithmToggleGroup.selectedToggleProperty().addListener((observable, oldVal, newVal) -> {
+            // Get the selected radio button
+            algorithmSelectedToggle = (RadioButton) chooseAlgorithmToggleGroup.getSelectedToggle();
+        });
+
+        originalImageRadioButton.setSelected(true);
+
+        VBox chooseAlgorithmVBox = new VBox(10);
+        chooseAlgorithmVBox.setPadding(new Insets(10));
+        chooseAlgorithmVBox.getChildren().addAll(originalImageRadioButton, FirstAlgoRadioButton, SecondAlgoRadioButton);
+
+        return chooseAlgorithmVBox;
+    }
+    private HBox getColorRadioButtonsHBox() {
+        RadioButton twoColorsRadioButton = new RadioButton("2");
+        RadioButton fourColorsRadioButton = new RadioButton("4");
+        RadioButton eightColorsRadioButton = new RadioButton("8");
+        RadioButton sixteenColorsRadioButton = new RadioButton("16");
+        RadioButton thirtyTwoColorsRadioButton = new RadioButton("32");
+        RadioButton sixtyFourColorsRadioButton = new RadioButton("64");
+        RadioButton oneTwoEightColorsRadioButton = new RadioButton("128");
+        RadioButton twoFiveSixColorsRadioButton = new RadioButton("256");
+
+        ToggleGroup colorsToggleGroupRadioButtons = new ToggleGroup();
+
+        // Add a listener to the selected toggle property
+        colorsToggleGroupRadioButtons.selectedToggleProperty().addListener((observable, oldVal, newVal) -> {
+            // Get the selected radio button
+            colorsSelectedToggle = (RadioButton) colorsToggleGroupRadioButtons.getSelectedToggle();
+        });
+        twoColorsRadioButton.setSelected(true);
+
+        twoColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
+        fourColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
+        eightColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
+        sixteenColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
+        thirtyTwoColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
+        sixtyFourColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
+        oneTwoEightColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
+        twoFiveSixColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
+
+        HBox hBoxColorsRadioButtons = new HBox(10);
+        hBoxColorsRadioButtons.setAlignment(Pos.CENTER);
+        hBoxColorsRadioButtons.getChildren().addAll(twoColorsRadioButton, fourColorsRadioButton, eightColorsRadioButton,
+                sixteenColorsRadioButton, thirtyTwoColorsRadioButton, sixtyFourColorsRadioButton, oneTwoEightColorsRadioButton,
+                twoFiveSixColorsRadioButton);
+
+        return hBoxColorsRadioButtons;
+    }
+
 }

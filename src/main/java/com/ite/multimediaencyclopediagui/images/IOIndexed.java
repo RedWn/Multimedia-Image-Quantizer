@@ -50,7 +50,7 @@ public class IOIndexed {
                 incrementalColorIndex++;
             }
 
-            dos.writeShort(colorsMap.get(colorRGBValue));
+            dos.writeByte(colorsMap.get(colorRGBValue));
         }
 
         colorsMap.forEach((colorRGBValue, colorIndexInMap) -> {
@@ -120,7 +120,7 @@ public class IOIndexed {
         Vector<Float> colorPercentageMap = new Vector<>();
 
         // Skip all color indices and reach for the actual colors map which contains rgb values
-        sourceImageData.skipBytes(finalImage.pixels.length * 2);
+        sourceImageData.skipBytes(finalImage.pixels.length);
 
         boolean hasReachedEndOfFile = false;
 
@@ -152,7 +152,7 @@ public class IOIndexed {
             Pixel temp = new Pixel();
             temp.index = i; //this is the index of the pixel in the context of the image
 
-            int colorIndex = sourceImageDataForSecondPass.readShort();
+            int colorIndex = sourceImageDataForSecondPass.readUnsignedByte();
             temp.RGB = colorsMap.elementAt(colorIndex).RGB;
             finalImage.pixels[i] = temp;
         }

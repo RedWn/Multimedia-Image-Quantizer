@@ -21,6 +21,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Vector;
 
 
 public class HelloApplication extends Application {
@@ -37,6 +38,9 @@ public class HelloApplication extends Application {
      * Directory where images are stored after applying the algorithm.
      */
     private String resultsDirectory = "D:\\";
+
+    private DirectoryChooser directoryChooser = new DirectoryChooser();
+    private FileChooser fileChooser = new FileChooser();
     private final Scene mainAlgorithmScene = this.getMainAlgorithmScene();
     private final Scene searchScene = this.getSearchScene();
 
@@ -49,7 +53,6 @@ public class HelloApplication extends Application {
     public void start(Stage stage) {
         window = stage;
         window.setTitle("Multimedia Project");
-
         window.setMinWidth(1000);
         window.setMinHeight(500);
 
@@ -58,7 +61,6 @@ public class HelloApplication extends Application {
     }
 
     private HBox getColorRadioButtonsHBox() {
-        // Create the radio buttons
         RadioButton twoColorsRadioButton = new RadioButton("2");
         RadioButton fourColorsRadioButton = new RadioButton("4");
         RadioButton eightColorsRadioButton = new RadioButton("8");
@@ -68,7 +70,6 @@ public class HelloApplication extends Application {
         RadioButton oneTwoEightColorsRadioButton = new RadioButton("128");
         RadioButton twoFiveSixColorsRadioButton = new RadioButton("256");
 
-        // Create a toggle group and add the radio buttons to it
         ToggleGroup colorsToggleGroupRadioButtons = new ToggleGroup();
 
         // Add a listener to the selected toggle property
@@ -107,14 +108,12 @@ public class HelloApplication extends Application {
         imageViewFirstAlgo.setPreserveRatio(true);
         imageViewSecondAlgo.setPreserveRatio(true);
 
-        DirectoryChooser resultsDirectoryChooser = new DirectoryChooser();
-
         Text resultsDirectoryTextNode = new Text();
         resultsDirectoryTextNode.setText(resultsDirectory);
 
         Button chooseDirectoryButton = new Button("Change directory:");
         chooseDirectoryButton.setOnAction(e -> {
-            File chosenDirectory = resultsDirectoryChooser.showDialog(window);
+            File chosenDirectory = directoryChooser.showDialog(window);
             if (chosenDirectory != null) {
                 this.resultsDirectory = chosenDirectory.toString();
                 resultsDirectoryTextNode.setText(chosenDirectory.toString());
@@ -122,12 +121,11 @@ public class HelloApplication extends Application {
 
         });
 
-        FileChooser userImageChooser = new FileChooser();
         Button uploadImageButton = new Button("Choose an image");
-
         uploadImageButton.setOnAction(e -> {
             try {
-                File chosenFile = userImageChooser.showOpenDialog(window);
+                File chosenFile = fileChooser.showOpenDialog(window);
+                if (chosenFile == null) return;
 
                 Image image = new Image(chosenFile.toURI().toString());
                 imageViewOriginal.setImage(image);
@@ -246,18 +244,22 @@ public class HelloApplication extends Application {
             window.setScene(mainAlgorithmScene);
         });
 
-        Button uploadSearchImage = new Button("Choose an image to search for");
+        Button uploadSearchImageButton = new Button("Choose an image to search for");
 
         GridPane searchResultsGridPane = new GridPane();
         searchResultsGridPane.setAlignment(Pos.CENTER);
         searchResultsGridPane.setHgap(10);
         searchResultsGridPane.setVgap(10);
 
+        int MAX_GRIDPANE_COLUMNS = 4;
+        int MAX_GRIDPANE_ROWS = 4;
+
         Label searchResultsLabel = new Label();
         searchResultsLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: 700;");
 
-        uploadSearchImage.setOnAction(e -> {
+        uploadSearchImageButton.setOnAction(e -> {
             File chosenFile = searchImageChooser.showOpenDialog(window);
+            if (chosenFile == null) return;
             searchResultsLabel.setText("Loading...");
 
             try {
@@ -290,8 +292,8 @@ public class HelloApplication extends Application {
                     imageView.setFitWidth(200);
                     imageView.setFitHeight(200);
 
-                    int col = searchResultsGridPane.getChildren().size() % 4;
-                    int row = searchResultsGridPane.getChildren().size() / 4;
+                    int col = searchResultsGridPane.getChildren().size() % MAX_GRIDPANE_COLUMNS;
+                    int row = searchResultsGridPane.getChildren().size() / MAX_GRIDPANE_ROWS;
 
                     Text filePathText = new Text(foundFiles[i].getAbsolutePath());
                     box.getChildren().addAll(imageView, filePathText);
@@ -304,10 +306,31 @@ public class HelloApplication extends Application {
             }
         });
 
+
+        Vector<File> chosenSearchDirectories = new Vector();
+        Text chosenSearchDirectoriesTextNode = new Text();
+
+        Button chooseSearchDirectoriesButton = new Button("Select search directories");
+        chooseSearchDirectoriesButton.setOnAction(e -> {
+            File file = directoryChooser.showDialog(window);
+            if (file == null) return;
+
+            chosenSearchDirectories.add(file);
+            StringBuilder chosenSearchDirectoriesString = new StringBuilder();
+            chosenSearchDirectories.forEach(directory -> {
+                chosenSearchDirectoriesString
+                        .append(directory)
+                        .append(" \n");
+            });
+
+            chosenSearchDirectoriesTextNode.setText(chosenSearchDirectoriesString.toString());
+        });
+
+
         VBox searchSceneContainer = new VBox();
         searchSceneContainer.setAlignment(Pos.CENTER);
         searchSceneContainer.setSpacing(15);
-        searchSceneContainer.getChildren().addAll(uploadSearchImage, searchResultsLabel, searchResultsGridPane, gotoMainAlgorithmScene);
+        searchSceneContainer.getChildren().addAll(chooseSearchDirectoriesButton, chosenSearchDirectoriesTextNode, uploadSearchImageButton, searchResultsLabel, searchResultsGridPane, gotoMainAlgorithmScene);
 
         ScrollPane searchScrollPane = new ScrollPane();
         searchScrollPane.setFitToWidth(true);

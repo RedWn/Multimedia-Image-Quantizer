@@ -7,12 +7,10 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -41,11 +39,9 @@ public class HelloApplication extends Application {
     /**
      * Directory where images are stored after applying the algorithm.
      */
-    private String resultsDirectory = "D:\\Test";
+    private String resultsDirectory = "D:\\";
     private final Scene mainAlgorithmScene = this.getMainAlgorithmScene();
     private final Scene searchScene = this.getSearchScene();
-
-
 
     public static void main(String[] args) {
         launch();
@@ -234,10 +230,12 @@ public class HelloApplication extends Application {
                 gotoSearchScene
         );
 
-        StackPane mainAlgorithmLayout = new StackPane();
-        mainAlgorithmLayout.getChildren().addAll(mainAlgorithmSceneContainer);
+        ScrollPane mainAlgorithmScrollPane = new ScrollPane();
+        mainAlgorithmScrollPane.setFitToHeight(true);
+        mainAlgorithmScrollPane.setFitToWidth(true);
+        mainAlgorithmScrollPane.setContent(mainAlgorithmSceneContainer);
 
-        return new Scene(mainAlgorithmLayout, 1000, 500);
+        return new Scene(mainAlgorithmScrollPane, 1000, 500);
     }
 
     private Scene getSearchScene() {
@@ -250,13 +248,18 @@ public class HelloApplication extends Application {
 
         Button uploadSearchImage = new Button("Choose an image to search for");
 
-        VBox searchSceneContainer = new VBox();
-        searchSceneContainer.setAlignment(Pos.CENTER);
-        searchSceneContainer.setSpacing(15);
-        searchSceneContainer.getChildren().addAll(uploadSearchImage, gotoMainAlgorithmScene);
+        GridPane searchResultsGridPane = new GridPane();
+        searchResultsGridPane.setAlignment(Pos.CENTER);
+        searchResultsGridPane.setHgap(10);
+        searchResultsGridPane.setVgap(10);
+
+        Label searchResultsLabel = new Label();
+        searchResultsLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: 700;");
 
         uploadSearchImage.setOnAction(e -> {
             File chosenFile = searchImageChooser.showOpenDialog(window);
+            searchResultsLabel.setText("Loading...");
+
             try {
                 Searcher.setTarget(chosenFile, 10);
                 System.out.print("Searching for images similar to ");
@@ -264,7 +267,12 @@ public class HelloApplication extends Application {
                 System.out.println();
                 File[] foundFiles = Searcher.Search(resultsDirectory);
 
-                System.out.printf("Search done. Found %d files.\n", foundFiles.length);
+                if (foundFiles.length == 0) {
+                    searchResultsLabel.setText("No similar images were found.");
+                } else {
+                    searchResultsLabel.setText("Search done. Found " + foundFiles.length + " files.");
+                }
+
                 for (int i = 0; i < foundFiles.length; i++) {
                     System.out.println(foundFiles[i].getAbsolutePath());
 
@@ -272,25 +280,41 @@ public class HelloApplication extends Application {
                     BufferedImage bufferedImageMatch = ImageUtils.PixelsToImage(imageMatch.pixels, imageMatch.width, imageMatch.height, 2);
                     Image nonBufferedImageMatch = ImageUtils.ConvertBufferedImageToImage(bufferedImageMatch);
 
-                    ImageView imageView = new ImageView();
+                    VBox box = new VBox();
+                    box.setAlignment(Pos.BOTTOM_CENTER);
+                    box.setSpacing(5);
 
+                    ImageView imageView = new ImageView();
                     imageView.setImage(nonBufferedImageMatch);
                     imageView.setPreserveRatio(true);
                     imageView.setFitWidth(200);
                     imageView.setFitHeight(200);
 
-                    searchSceneContainer.getChildren().add(imageView);
+                    int col = searchResultsGridPane.getChildren().size() % 4;
+                    int row = searchResultsGridPane.getChildren().size() / 4;
+
+                    Text filePathText = new Text(foundFiles[i].getAbsolutePath());
+                    box.getChildren().addAll(imageView, filePathText);
+
+                    // SPECIFY COLUMN THEN ROW
+                    searchResultsGridPane.add(box, col, row);
                 }
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
         });
 
-        StackPane searchLayout = new StackPane();
-        searchLayout.getChildren().addAll(searchSceneContainer);
+        VBox searchSceneContainer = new VBox();
+        searchSceneContainer.setAlignment(Pos.CENTER);
+        searchSceneContainer.setSpacing(15);
+        searchSceneContainer.getChildren().addAll(uploadSearchImage, searchResultsLabel, searchResultsGridPane, gotoMainAlgorithmScene);
 
-        return new Scene(searchLayout, 1000, 500);
+        ScrollPane searchScrollPane = new ScrollPane();
+        searchScrollPane.setFitToWidth(true);
+        searchScrollPane.setFitToHeight(true);
+        searchScrollPane.setPadding(new Insets(20));
+        searchScrollPane.setContent(searchSceneContainer);
+
+        return new Scene(searchScrollPane, 1000, 500);
     }
-
-
 }

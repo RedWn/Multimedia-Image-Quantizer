@@ -21,7 +21,7 @@ public class IOIndexed {
      * - [...colorIndices]
      * - Colors map: [rgb percentageOfColorInImage, rgb percentageOfColorInImage]
      */
-    public static void writeIndexed(BufferedImage BI, String fileName) throws IOException {
+    public static void convertImageToIndexedAndWriteToDisk(BufferedImage BI, String fileName) throws IOException {
         DataOutputStream dos = new DataOutputStream(new FileOutputStream(fileName));
 
         // Mark this file as written by us.
@@ -55,7 +55,7 @@ public class IOIndexed {
 
         colorsMap.forEach((colorRGBValue, colorIndexInMap) -> {
             try {
-                Pixel pixel = ImageUtils.convertRGBToPixel(colorRGBValue);
+                Pixel pixel = ImageUtils.convertRGBValueToPixel(colorRGBValue);
                 dos.writeShort(pixel.RGB[0]);
                 dos.writeShort(pixel.RGB[1]);
                 dos.writeShort(pixel.RGB[2]);
@@ -71,58 +71,9 @@ public class IOIndexed {
         dos.writeShort(END_OF_FILE_MARKER);
     }
 
-    //probably deprecated
-    public static IndexedImage readIndexed(String fileName) throws IOException {
-        DataInputStream dis = new DataInputStream(new FileInputStream(fileName));
-        int buffer;
-
-        if (dis.readShort() != 888) {
-            return new IndexedImage();
-        }
-
-        int width = dis.readShort();
-        int height = dis.readShort();
-
-        IndexedImage ans = new IndexedImage();
-        ans.pixels = new Pixel[width * height];
-
-        Vector<Pixel> colors = new Vector<>();
-
-        dis.skipBytes(ans.pixels.length);
-
-        boolean getOut = false;
-        while (true) {
-            Pixel temp = new Pixel();
-            for (int j = 0; j < 3; j++) {
-                buffer = dis.readShort();
-                if (buffer == -1) {
-                    getOut = true;
-                    break;
-                }
-                temp.RGB[j] = buffer;
-            }
-            if (getOut)
-                break;
-            colors.add(temp);
-            dis.readFloat();
-        }
-
-        dis = new DataInputStream(new FileInputStream(fileName));
-        dis.skipBytes(6);
-        for (int i = 0; i < ans.pixels.length; i++) {
-            Pixel temp = new Pixel();
-            temp.index = i;
-            buffer = dis.readByte();
-            temp.RGB = colors.elementAt(buffer).RGB;
-            ans.pixels[i] = temp;
-        }
-        ans.width = width;
-        ans.height = height;
-        return ans;
-    }
-
-    public static IndexedImage readIndexedWithPercentages(String fileName) throws IOException {
+    public static IndexedImage readIndexedImageFromDisk(String fileName) throws IOException {
         DataInputStream sourceImageData = new DataInputStream(new FileInputStream(fileName));
+        DataInputStream sourceImageDataForSecondPass = new DataInputStream(new FileInputStream(fileName));
 
         // We cannot process this image since it's not written by us
         if (sourceImageData.readShort() != REDWAN_INDEXED_IMAGE_MARKER) {
@@ -144,19 +95,20 @@ public class IOIndexed {
         // Skip all color indices and reach for the actual colors map which contains rgb values
         sourceImageData.skipBytes(finalImage.pixels.length);
 
-        boolean getOut = false;
+        boolean hasReachedEndOfFile = false;
+
         while (true) {
             Pixel temp = new Pixel();
             for (int j = 0; j < 3; j++) {
                 int colorComponent = sourceImageData.readShort();
                 if (colorComponent == END_OF_FILE_MARKER) {
-                    getOut = true;
+                    hasReachedEndOfFile = true;
                     break;
                 }
                 temp.RGB[j] = colorComponent;
             }
 
-            if (getOut) break;
+            if (hasReachedEndOfFile) break;
 
             colorsMap.add(temp);
 
@@ -164,17 +116,15 @@ public class IOIndexed {
             colorPercentageMap.add(colorPercentage);
         }
 
-        sourceImageData = new DataInputStream(new FileInputStream(fileName));
 
         // Skip special marker + width + height and reach for color indices
-        sourceImageData.skipBytes(6);
+        sourceImageDataForSecondPass.skipBytes(6);
 
         for (int i = 0; i < finalImage.pixels.length; i++) {
             Pixel temp = new Pixel();
-            int colorIndex = sourceImageData.readByte();
+            temp.index = i; //this is the index of the pixel in the context of the image
 
-            temp.index = i; // TODO: Why? Shouldn't this be temp.index = colorIndex ?
-            //this is the index of the pixel in the context of the image
+            int colorIndex = sourceImageDataForSecondPass.readByte();
             temp.RGB = colorsMap.elementAt(colorIndex).RGB;
 
             finalImage.pixels[i] = temp;

@@ -94,13 +94,15 @@ public class Searcher {
         return ans;
     }
 
-    public static void setTarget(String fileDirectory, int nColors) throws IOException {
+    public static void setTarget(File imageToSearchFor, int nColors) throws IOException {
         //a good question is should we choose the wanted colors automatically or should we give the user the choice?
         //I have no evidence this will make a difference if you are using more than 1 color!
-        File file = new File(fileDirectory);
-        IndexedImage II = IOIndexed.readIndexedWithPercentages(file.getAbsolutePath());
+
+        IndexedImage II = IOIndexed.readIndexedImageFromDisk(imageToSearchFor.getAbsolutePath());
         int maxIndex = 0;
+
         Vector<Integer> taken = new Vector<>();
+
         while (nColors != 0) {
             float max = Float.MIN_VALUE;
             for (int i = 0; i < II.colorPercentage.length; i++) {

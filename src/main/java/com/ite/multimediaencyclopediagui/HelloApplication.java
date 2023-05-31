@@ -1,13 +1,16 @@
 package com.ite.multimediaencyclopediagui;
 
-import com.ite.multimediaencyclopediagui.images.*;
 import com.ite.multimediaencyclopediagui.images.Algorithms.LloydsAlgorithm;
 import com.ite.multimediaencyclopediagui.images.Algorithms.MedianCutAlgorithm;
+import com.ite.multimediaencyclopediagui.images.*;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -21,6 +24,7 @@ import javafx.stage.Stage;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 
 
@@ -37,13 +41,16 @@ public class HelloApplication extends Application {
     /**
      * Directory where images are stored after applying the algorithm.
      */
-    private String resultsDirectory = "D:\\";
-    private Scene searchScene;
-    private Scene mainAlgorithmScene;
+    private String resultsDirectory = "D:\\Test";
+    private final Scene mainAlgorithmScene = this.getMainAlgorithmScene();
+    private final Scene searchScene = this.getSearchScene();
+
+
 
     public static void main(String[] args) {
         launch();
     }
+
 
     @Override
     public void start(Stage stage) {
@@ -52,6 +59,50 @@ public class HelloApplication extends Application {
         window.setMinWidth(1000);
         window.setMinHeight(500);
 
+        stage.setScene(mainAlgorithmScene);
+        stage.show();
+    }
+
+    private HBox getColorRadioButtonsHBox() {
+        // Create the radio buttons
+        RadioButton twoColorsRadioButton = new RadioButton("2");
+        RadioButton fourColorsRadioButton = new RadioButton("4");
+        RadioButton eightColorsRadioButton = new RadioButton("8");
+        RadioButton sixteenColorsRadioButton = new RadioButton("16");
+        RadioButton thirtyTwoColorsRadioButton = new RadioButton("32");
+        RadioButton sixtyFourColorsRadioButton = new RadioButton("64");
+        RadioButton oneTwoEightColorsRadioButton = new RadioButton("128");
+        RadioButton twoFiveSixColorsRadioButton = new RadioButton("256");
+
+        // Create a toggle group and add the radio buttons to it
+        ToggleGroup colorsToggleGroupRadioButtons = new ToggleGroup();
+
+        // Add a listener to the selected toggle property
+        colorsToggleGroupRadioButtons.selectedToggleProperty().addListener((observable, oldVal, newVal) -> {
+            // Get the selected radio button
+            colorsSelectedToggle = (RadioButton) colorsToggleGroupRadioButtons.getSelectedToggle();
+        });
+        twoColorsRadioButton.setSelected(true);
+
+        twoColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
+        fourColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
+        eightColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
+        sixteenColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
+        thirtyTwoColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
+        sixtyFourColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
+        oneTwoEightColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
+        twoFiveSixColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
+
+        HBox hBoxColorsRadioButtons = new HBox(10);
+        hBoxColorsRadioButtons.setAlignment(Pos.CENTER);
+        hBoxColorsRadioButtons.getChildren().addAll(twoColorsRadioButton, fourColorsRadioButton, eightColorsRadioButton,
+                sixteenColorsRadioButton, thirtyTwoColorsRadioButton, sixtyFourColorsRadioButton, oneTwoEightColorsRadioButton,
+                twoFiveSixColorsRadioButton);
+
+        return hBoxColorsRadioButtons;
+    }
+
+    private Scene getMainAlgorithmScene() {
         Image placeholderImage = new Image("default_image.png");
 
         imageViewOriginal.setImage(placeholderImage);
@@ -69,7 +120,7 @@ public class HelloApplication extends Application {
 
         Button chooseDirectoryButton = new Button("Change directory:");
         chooseDirectoryButton.setOnAction(e -> {
-            File chosenDirectory = resultsDirectoryChooser.showDialog(stage);
+            File chosenDirectory = resultsDirectoryChooser.showDialog(window);
             if (chosenDirectory != null) {
                 this.resultsDirectory = chosenDirectory.toString();
                 resultsDirectoryTextNode.setText(chosenDirectory.toString());
@@ -82,7 +133,7 @@ public class HelloApplication extends Application {
 
         uploadImageButton.setOnAction(e -> {
             try {
-                File chosenFile = userImageChooser.showOpenDialog(stage);
+                File chosenFile = userImageChooser.showOpenDialog(window);
 
                 Image image = new Image(chosenFile.toURI().toString());
                 imageViewOriginal.setImage(image);
@@ -99,22 +150,8 @@ public class HelloApplication extends Application {
                 BufferedImage bufferedQuantizedImage2 = ImageUtils.PixelsToImage(quantizedPixels2, originalPicture.getWidth(), originalPicture.getHeight(), originalPicture.getType());
                 Image nonBufferedQuantizedImageToMakeJavaHappy2 = ImageUtils.ConvertBufferedImageToImage(bufferedQuantizedImage2);
 
-                IOIndexed.writeIndexed(bufferedQuantizedImage, Path.of(resultsDirectory, "output1.rii").toString());
-                IOIndexed.writeIndexed(bufferedQuantizedImage2, Path.of(resultsDirectory, "output2.rii").toString());
-
-//                IndexedImage indexed = IOIndexed.readIndexed("output.rii");
-//                BufferedImage bufferedQuantizedImageX = ImageUtils.PixelsToImage(indexed.pixels, indexed.width, indexed.height, originalPicture.getType());
-//                Image nonBufferedQuantizedImageToMakeJavaHappyX = ImageUtils.ConvertBufferedImageToImage(bufferedQuantizedImageX);
-
-//                ImageIO.write(bufferedQuantizedImage, "jpg", new File(pathname));
-//                ImageIO.write(bufferedQuantizedImage2, "jpg", new File(pathname2));
-
-
-//                 HOW TO SEARCH?
-//                 first, set the picture you want to search for its lookalikes like this
-//                 Searcher.setTarget("filepath", number of colors);
-//                 second, start the search with this call
-//                 File[] foundFiles = Searcher.Search("directory");
+                IOIndexed.convertImageToIndexedAndWriteToDisk(bufferedQuantizedImage, Path.of(resultsDirectory, ImageUtils.getFileBaseName(chosenFile.getName()) + "_median_cut.rii").toString());
+                IOIndexed.convertImageToIndexedAndWriteToDisk(bufferedQuantizedImage2, Path.of(resultsDirectory, ImageUtils.getFileBaseName(chosenFile.getName()) + "_lloyd.rii").toString());
 
                 imageViewFirstAlgo.setImage(nonBufferedQuantizedImageToMakeJavaHappy);
                 imageViewSecondAlgo.setImage(nonBufferedQuantizedImageToMakeJavaHappy2);
@@ -185,7 +222,7 @@ public class HelloApplication extends Application {
 
         Button gotoSearchScene = new Button("Search for images");
         gotoSearchScene.setOnAction(e -> {
-            stage.setScene(searchScene);
+            window.setScene(searchScene);
         });
 
         mainAlgorithmSceneContainer.getChildren().addAll(
@@ -200,69 +237,60 @@ public class HelloApplication extends Application {
         StackPane mainAlgorithmLayout = new StackPane();
         mainAlgorithmLayout.getChildren().addAll(mainAlgorithmSceneContainer);
 
-        // Search scene
+        return new Scene(mainAlgorithmLayout, 1000, 500);
+    }
+
+    private Scene getSearchScene() {
+        FileChooser searchImageChooser = new FileChooser();
+
         Button gotoMainAlgorithmScene = new Button("Go Back");
         gotoMainAlgorithmScene.setOnAction(e -> {
-            stage.setScene(mainAlgorithmScene);
+            window.setScene(mainAlgorithmScene);
         });
 
         Button uploadSearchImage = new Button("Choose an image to search for");
-        uploadImageButton.setOnAction(e -> {
-            File chosenFile = userImageChooser.showOpenDialog(stage);
-
-        });
 
         VBox searchSceneContainer = new VBox();
         searchSceneContainer.setAlignment(Pos.CENTER);
         searchSceneContainer.setSpacing(15);
-        searchSceneContainer.getChildren().addAll(new Label("Search scene"),uploadSearchImage, gotoMainAlgorithmScene);
+        searchSceneContainer.getChildren().addAll(uploadSearchImage, gotoMainAlgorithmScene);
+
+        uploadSearchImage.setOnAction(e -> {
+            File chosenFile = searchImageChooser.showOpenDialog(window);
+            try {
+                Searcher.setTarget(chosenFile, 10);
+                System.out.print("Searching for images similar to ");
+                System.out.print(chosenFile.getName());
+                System.out.println();
+                File[] foundFiles = Searcher.Search(resultsDirectory);
+
+                System.out.printf("Search done. Found %d files.\n", foundFiles.length);
+                for (int i = 0; i < foundFiles.length; i++) {
+                    System.out.println(foundFiles[i].getAbsolutePath());
+
+                    IndexedImage imageMatch = IOIndexed.readIndexedImageFromDisk(foundFiles[i].getAbsolutePath());
+                    BufferedImage bufferedImageMatch = ImageUtils.PixelsToImage(imageMatch.pixels, imageMatch.width, imageMatch.height, 2);
+                    Image nonBufferedImageMatch = ImageUtils.ConvertBufferedImageToImage(bufferedImageMatch);
+
+                    ImageView imageView = new ImageView();
+
+                    imageView.setImage(nonBufferedImageMatch);
+                    imageView.setPreserveRatio(true);
+                    imageView.setFitWidth(200);
+                    imageView.setFitHeight(200);
+
+                    searchSceneContainer.getChildren().add(imageView);
+                }
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
 
         StackPane searchLayout = new StackPane();
         searchLayout.getChildren().addAll(searchSceneContainer);
 
-        mainAlgorithmScene = new Scene(mainAlgorithmLayout, 1000, 500);
-        searchScene = new Scene(searchLayout, 1000, 500);
-
-        stage.setScene(mainAlgorithmScene);
-        stage.show();
+        return new Scene(searchLayout, 1000, 500);
     }
 
-    private HBox getColorRadioButtonsHBox() {
-        // Create the radio buttons
-        RadioButton twoColorsRadioButton = new RadioButton("2");
-        RadioButton fourColorsRadioButton = new RadioButton("4");
-        RadioButton eightColorsRadioButton = new RadioButton("8");
-        RadioButton sixteenColorsRadioButton = new RadioButton("16");
-        RadioButton thirtyTwoColorsRadioButton = new RadioButton("32");
-        RadioButton sixtyFourColorsRadioButton = new RadioButton("64");
-        RadioButton oneTwoEightColorsRadioButton = new RadioButton("128");
-        RadioButton twoFiveSixColorsRadioButton = new RadioButton("256");
 
-        // Create a toggle group and add the radio buttons to it
-        ToggleGroup colorsToggleGroupRadioButtons = new ToggleGroup();
-
-        // Add a listener to the selected toggle property
-        colorsToggleGroupRadioButtons.selectedToggleProperty().addListener((observable, oldVal, newVal) -> {
-            // Get the selected radio button
-            colorsSelectedToggle = (RadioButton) colorsToggleGroupRadioButtons.getSelectedToggle();
-        });
-        twoColorsRadioButton.setSelected(true);
-
-        twoColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
-        fourColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
-        eightColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
-        sixteenColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
-        thirtyTwoColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
-        sixtyFourColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
-        oneTwoEightColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
-        twoFiveSixColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
-
-        HBox hBoxColorsRadioButtons = new HBox(10);
-        hBoxColorsRadioButtons.setAlignment(Pos.CENTER);
-        hBoxColorsRadioButtons.getChildren().addAll(twoColorsRadioButton, fourColorsRadioButton, eightColorsRadioButton,
-                sixteenColorsRadioButton, thirtyTwoColorsRadioButton, sixtyFourColorsRadioButton, oneTwoEightColorsRadioButton,
-                twoFiveSixColorsRadioButton);
-
-        return hBoxColorsRadioButtons;
-    }
 }

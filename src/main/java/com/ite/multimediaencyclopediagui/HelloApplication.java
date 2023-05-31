@@ -10,10 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -52,6 +49,7 @@ public class HelloApplication extends Application {
     public void start(Stage stage) {
         window = stage;
         window.setTitle("Multimedia Project");
+
         window.setMinWidth(1000);
         window.setMinHeight(500);
 
@@ -221,6 +219,7 @@ public class HelloApplication extends Application {
             window.setScene(searchScene);
         });
 
+
         mainAlgorithmSceneContainer.getChildren().addAll(
                 directoryBox,
                 new Label("Choose how many colors do you want in the new image?"),
@@ -230,12 +229,13 @@ public class HelloApplication extends Application {
                 gotoSearchScene
         );
 
-        ScrollPane mainAlgorithmScrollPane = new ScrollPane();
-        mainAlgorithmScrollPane.setFitToHeight(true);
-        mainAlgorithmScrollPane.setFitToWidth(true);
-        mainAlgorithmScrollPane.setContent(mainAlgorithmSceneContainer);
+        Image bg = new Image("BG2.jpg", 1000, 500, false, true);
+        ImageView imageView = new ImageView(bg);
 
-        return new Scene(mainAlgorithmScrollPane, 1000, 500);
+        StackPane root = new StackPane();
+        root.getChildren().addAll(imageView, mainAlgorithmSceneContainer);
+
+        return new Scene(root, 1000, 500);
     }
 
     private Scene getSearchScene() {

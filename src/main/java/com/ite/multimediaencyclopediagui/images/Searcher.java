@@ -1,5 +1,7 @@
 package com.ite.multimediaencyclopediagui.images;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -97,8 +99,11 @@ public class Searcher {
     public static void setTarget(File imageToSearchFor, int nColors) throws IOException {
         //a good question is should we choose the wanted colors automatically or should we give the user the choice?
         //I have no evidence this will make a difference if you are using more than 1 color!
-
+//        BufferedImage BI = ImageIO.read(imageToSearchFor);
+//        IOIndexed.writeIndexed(BI,"temp.rii");
         IndexedImage II = IOIndexed.readIndexedImageFromDisk(imageToSearchFor.getAbsolutePath());
+//        IndexedImage II = IOIndexed.convertImageToIndexed(BI);
+//        IndexedImage II = IOIndexed.readIndexedImageFromDisk(imageToSearchFor.getAbsolutePath());
         int maxIndex = 0;
 
         Vector<Integer> taken = new Vector<>();

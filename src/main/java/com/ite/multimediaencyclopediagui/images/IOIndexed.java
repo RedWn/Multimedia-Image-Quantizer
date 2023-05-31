@@ -72,6 +72,32 @@ public class IOIndexed {
         dos.close();
     }
 
+
+//    public static IndexedImage convertImageToIndexed(BufferedImage BI) throws IOException {
+//        IndexedImage ans = new IndexedImage();
+//        ans.width = BI.getWidth();
+//        ans.height = BI.getHeight();
+//
+//        int[] colorsRepetition = new int[256];
+//        Vector<Integer> colors = new Vector<>();
+//        for (int i = 0; i < BI.getWidth()*BI.getHeight(); i++) {
+//            int color = BI.getRGB(i%BI.getWidth(),i/BI.getWidth());
+//            if (!colors.contains(color)) {
+//                colors.add(color);
+//            }
+//            colorsRepetition[colors.indexOf(color)]++;
+//            ans.pixels = colors.indexOf(color);
+//        }
+//        for (Integer color : colors) {
+//            Pixel temp = ImageManipulation.convertToPixel(color);
+//            dos.writeShort(temp.RGB[0]);
+//            dos.writeShort(temp.RGB[1]);
+//            dos.writeShort(temp.RGB[2]);
+//            dos.writeFloat((float) (colorsRepetition[colors.indexOf(color)])/(BI.getWidth()*BI.getHeight()));
+//        }
+//        dos.writeShort(-1);
+//    }
+
     public static IndexedImage readIndexedImageFromDisk(String fileName) throws IOException {
         DataInputStream sourceImageData = new DataInputStream(new FileInputStream(fileName));
         DataInputStream sourceImageDataForSecondPass = new DataInputStream(new FileInputStream(fileName));
@@ -94,7 +120,7 @@ public class IOIndexed {
         Vector<Float> colorPercentageMap = new Vector<>();
 
         // Skip all color indices and reach for the actual colors map which contains rgb values
-        sourceImageData.skipBytes(finalImage.pixels.length);
+        sourceImageData.skipBytes(finalImage.pixels.length * 2);
 
         boolean hasReachedEndOfFile = false;
 

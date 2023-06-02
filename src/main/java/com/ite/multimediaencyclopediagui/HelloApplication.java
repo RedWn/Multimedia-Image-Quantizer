@@ -72,7 +72,8 @@ public class HelloApplication extends Application {
         Text resultsDirectoryTextNode = new Text();
         resultsDirectoryTextNode.setText(resultsDirectory);
 
-        Button chooseDirectoryButton = new Button("Change directory:");
+        Label chooseDirectoryLabel = new Label("Where to save the result images?");
+        Button chooseDirectoryButton = new Button("Choose directory:");
         chooseDirectoryButton.setOnAction(e -> {
             File chosenDirectory = directoryChooser.showDialog(window);
             if (chosenDirectory != null) {
@@ -120,9 +121,9 @@ public class HelloApplication extends Application {
                 hBox.getChildren().addAll(imageViewOriginal, imageViewFirstAlgo, imageViewSecondAlgo);
                 hBox.setAlignment(Pos.CENTER);
 
-                Label label1 = new Label("Original");
-                Label label2 = new Label("1st Algorithm");
-                Label label3 = new Label("2nd Algorithm");
+                Label label1 = new Label("Original image");
+                Label label2 = new Label("Median Cut Algorithm");
+                Label label3 = new Label("Lloyd's Algorithm");
                 HBox hBoxLabels = new HBox(350);
                 hBoxLabels.setAlignment(Pos.CENTER);
                 hBoxLabels.getChildren().addAll(label1, label2, label3);
@@ -169,6 +170,7 @@ public class HelloApplication extends Application {
 
 
         mainAlgorithmSceneContainer.getChildren().addAll(
+                chooseDirectoryLabel,
                 directoryBox,
                 new Label("Choose how many colors do you want in the new image?"),
                 this.getColorRadioButtonsHBox(),
@@ -290,9 +292,9 @@ public class HelloApplication extends Application {
     }
     VBox chooseAlgorithmVBox(){
         ToggleGroup chooseAlgorithmToggleGroup = new ToggleGroup();
-        RadioButton originalImageRadioButton = new RadioButton("Original");
-        RadioButton FirstAlgoRadioButton = new RadioButton("1st Algorithm");
-        RadioButton SecondAlgoRadioButton = new RadioButton("2nd Algorithm");
+        RadioButton originalImageRadioButton = new RadioButton("Original image");
+        RadioButton FirstAlgoRadioButton = new RadioButton("Median Cut Algorithm");
+        RadioButton SecondAlgoRadioButton = new RadioButton("Lloyd's Algorithm");
 
         originalImageRadioButton.setToggleGroup(chooseAlgorithmToggleGroup);
         FirstAlgoRadioButton.setToggleGroup(chooseAlgorithmToggleGroup);

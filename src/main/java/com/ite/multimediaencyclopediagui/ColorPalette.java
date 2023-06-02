@@ -26,10 +26,10 @@ public class ColorPalette {
 
                 Image image;
 
-                if (HelloApplication.algorithmSelectedToggle.getText() =="Original") {
+                if (HelloApplication.algorithmSelectedToggle.getText() =="Original image") {
                     image = HelloApplication.imageViewOriginal.getImage();
                 }
-                else if(HelloApplication.algorithmSelectedToggle.getText() =="1st Algorithm"){
+                else if(HelloApplication.algorithmSelectedToggle.getText() =="Median Cut Algorithm"){
                     image = HelloApplication.imageViewFirstAlgo.getImage();
                 }
                 else{

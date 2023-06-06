@@ -3,6 +3,7 @@ package com.ite.multimediaencyclopediagui.images;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 public class IOIndexed {
@@ -53,50 +54,18 @@ public class IOIndexed {
             dos.writeByte(colorsMap.get(colorRGBValue));
         }
 
-        colorsMap.forEach((colorRGBValue, colorIndexInMap) -> {
-            try {
-                Pixel pixel = ImageUtils.convertRGBValueToPixel(colorRGBValue);
-                dos.writeShort(pixel.RGB[0]);
-                dos.writeShort(pixel.RGB[1]);
-                dos.writeShort(pixel.RGB[2]);
-
-                // percentage ==  (number of times the color was repeated) / (number of total pixels)
-                float colorPercentageInMap = (float) (colorOccurrences[colorIndexInMap]) / (BI.getWidth() * BI.getHeight());
-                dos.writeFloat(colorPercentageInMap);
-            } catch (Exception e) {
-
-            }
-        });
-
+        for (int i=0;i<colorsMap.size();i++){
+            int colorIndexInMap = getKeyFromValue(colorsMap,i); //this solution is shit, but I don't see another way
+            Pixel pixel = ImageUtils.convertRGBValueToPixel(colorIndexInMap);
+            dos.writeShort(pixel.RGB[0]);
+            dos.writeShort(pixel.RGB[1]);
+            dos.writeShort(pixel.RGB[2]);
+            float colorPercentageInMap = (float) (colorOccurrences[i]) / (BI.getWidth() * BI.getHeight());
+            dos.writeFloat(colorPercentageInMap);
+        }
         dos.writeShort(END_OF_FILE_MARKER);
         dos.close();
     }
-
-
-//    public static IndexedImage convertImageToIndexed(BufferedImage BI) throws IOException {
-//        IndexedImage ans = new IndexedImage();
-//        ans.width = BI.getWidth();
-//        ans.height = BI.getHeight();
-//
-//        int[] colorsRepetition = new int[256];
-//        Vector<Integer> colors = new Vector<>();
-//        for (int i = 0; i < BI.getWidth()*BI.getHeight(); i++) {
-//            int color = BI.getRGB(i%BI.getWidth(),i/BI.getWidth());
-//            if (!colors.contains(color)) {
-//                colors.add(color);
-//            }
-//            colorsRepetition[colors.indexOf(color)]++;
-//            ans.pixels = colors.indexOf(color);
-//        }
-//        for (Integer color : colors) {
-//            Pixel temp = ImageManipulation.convertToPixel(color);
-//            dos.writeShort(temp.RGB[0]);
-//            dos.writeShort(temp.RGB[1]);
-//            dos.writeShort(temp.RGB[2]);
-//            dos.writeFloat((float) (colorsRepetition[colors.indexOf(color)])/(BI.getWidth()*BI.getHeight()));
-//        }
-//        dos.writeShort(-1);
-//    }
 
     public static IndexedImage readIndexedImageFromDisk(String fileName) throws IOException {
         DataInputStream sourceImageData = new DataInputStream(new FileInputStream(fileName));
@@ -171,4 +140,14 @@ public class IOIndexed {
 
         return finalImage;
     }
+
+    public static <K, V> K getKeyFromValue(HashMap<K, V> map, V value) {
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            if (entry.getValue().equals(value)) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
 }

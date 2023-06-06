@@ -21,7 +21,7 @@ public class Searcher {
         Vector<File> ans = new Vector<>();
         if (FF.isDirectory()) {
             for (File F : Objects.requireNonNull(FF.listFiles())) {
-                DataInputStream dis = new DataInputStream(new FileInputStream(F.getCanonicalFile()));
+                DataInputStream dis = new DataInputStream(new FileInputStream(F.getAbsoluteFile()));
                 if (dis.readShort() == 888) {
                     if (isSuitable(F)) {
                         ans.add(F);

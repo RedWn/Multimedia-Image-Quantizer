@@ -43,13 +43,12 @@ public class IOIndexed {
         for (int i = 0; i < BI.getWidth() * BI.getHeight(); i++) {
             int colorRGBValue = BI.getRGB(i % BI.getWidth(), i / BI.getWidth());
 
-            if (colorsMap.containsKey(colorRGBValue)) {
-                int colorIndex = colorsMap.get(colorRGBValue);
-                colorOccurrences[colorIndex]++;
-            } else {
+            if (!colorsMap.containsKey(colorRGBValue)) {
                 colorsMap.put(colorRGBValue, incrementalColorIndex);
                 incrementalColorIndex++;
             }
+            int colorIndex = colorsMap.get(colorRGBValue);
+            colorOccurrences[colorIndex]++;
 
             dos.writeByte(colorsMap.get(colorRGBValue));
         }

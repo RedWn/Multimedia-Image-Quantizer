@@ -350,7 +350,7 @@ public class HelloApplication extends Application {
 
         return hBoxColorsRadioButtons;
     }
-    VBox loading(Vector<File> chosenSearchDirectories){
+    private VBox loading(Vector<File> chosenSearchDirectories){
         // Create a progress bar and a progress indicator
         ProgressBar pb = new ProgressBar();
         ProgressIndicator pi = new ProgressIndicator();
@@ -363,7 +363,10 @@ public class HelloApplication extends Application {
             @Override
             protected Void call() throws Exception {
                 // Update the progress and the message every second
-                int numberOfFiles = numberOfFilesInDir(chosenSearchDirectories.firstElement().toString());
+                int numberOfFiles = 0;
+                for(int i = 0 ; i < chosenSearchDirectories.size() ; i++){
+                    numberOfFiles += numberOfFilesInDir(chosenSearchDirectories.elementAt(i).toString());
+                }
                 while(Searcher.loadingNumber < numberOfFiles) {
                     updateProgress(Searcher.loadingNumber + 1, numberOfFiles);
                     updateMessage("Working... (" + (Searcher.loadingNumber + 1) + "/" + numberOfFiles + ")");

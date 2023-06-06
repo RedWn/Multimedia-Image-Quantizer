@@ -17,7 +17,7 @@ public class LloydsAlgorithm {
         for (int i = 0; i < kMeans.length; i++) {
             int[] temp = new int[3];
             for (int j = 0; j < temp.length; j++) {
-                temp[j] = (rand.nextInt(256) + avg[j] - 128);
+                temp[j] = (rand.nextInt(128) + avg[j] - 64);
             }
             kMeans[i] = temp;
         }

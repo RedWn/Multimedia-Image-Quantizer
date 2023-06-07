@@ -20,14 +20,14 @@ public class Histogram {
             Stage popupStage = new Stage();
 
             Image image;
-            if (HelloApplication.algorithmSelectedToggle.getText() =="Original image") {
-                image = HelloApplication.imageViewOriginal.getImage();
+            if (Main.algorithmSelectedToggle.getText() =="Original image") {
+                image = Main.imageViewOriginal.getImage();
             }
-            else if(HelloApplication.algorithmSelectedToggle.getText() =="Median Cut Algorithm"){
-                image = HelloApplication.imageViewFirstAlgo.getImage();
+            else if(Main.algorithmSelectedToggle.getText() =="Median Cut Algorithm"){
+                image = Main.imageViewFirstAlgo.getImage();
             }
             else{
-                image = HelloApplication.imageViewSecondAlgo.getImage();
+                image = Main.imageViewSecondAlgo.getImage();
             }
 
             // Create the chart axes

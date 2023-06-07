@@ -1,4 +1,4 @@
-package com.ite.multimediaencyclopediagui.images;
+package com.ite.multimediaencyclopediagui.search;
 
 public class SearchColor{
     int[] RGB;

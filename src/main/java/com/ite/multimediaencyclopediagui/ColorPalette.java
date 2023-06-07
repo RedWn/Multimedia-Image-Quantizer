@@ -22,21 +22,21 @@ public class ColorPalette {
                 Stage popupStage = new Stage();
 
                 // Set the owner of the pop-up window to the primary stage
-                popupStage.initOwner(HelloApplication.window);
+                popupStage.initOwner(Main.window);
 
                 Image image;
 
-                if (HelloApplication.algorithmSelectedToggle.getText() =="Original image") {
-                    image = HelloApplication.imageViewOriginal.getImage();
+                if (Main.algorithmSelectedToggle.getText() =="Original image") {
+                    image = Main.imageViewOriginal.getImage();
                 }
-                else if(HelloApplication.algorithmSelectedToggle.getText() =="Median Cut Algorithm"){
-                    image = HelloApplication.imageViewFirstAlgo.getImage();
+                else if(Main.algorithmSelectedToggle.getText() =="Median Cut Algorithm"){
+                    image = Main.imageViewFirstAlgo.getImage();
                 }
                 else{
-                    image = HelloApplication.imageViewSecondAlgo.getImage();
+                    image = Main.imageViewSecondAlgo.getImage();
                 }
 
-                Integer numberOfColors = Integer.valueOf(HelloApplication.colorsSelectedToggle.getText());
+                Integer numberOfColors = Integer.valueOf(Main.colorsSelectedToggle.getText());
                 List<Color> colors = generateColorPalette(image, numberOfColors);
                 HBox colorBox = new HBox();
                 for (Color color : colors) {

@@ -122,19 +122,4 @@ public class ImageUtils {
         }
         return result;
     }
-
-    /**
-     * <p>
-     * Gets the base name, without extension, of given file name.
-     * <p/>
-     * e.g. getBaseName("file.txt") will return "file"
-     */
-    public static String getFileBaseName(String fileName) {
-        int index = fileName.lastIndexOf('.');
-        if (index == -1) {
-            return fileName;
-        } else {
-            return fileName.substring(0, index);
-        }
-    }
 }

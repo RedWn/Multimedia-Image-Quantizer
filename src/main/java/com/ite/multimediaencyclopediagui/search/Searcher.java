@@ -1,7 +1,10 @@
-package com.ite.multimediaencyclopediagui.images;
+package com.ite.multimediaencyclopediagui.search;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
+import com.ite.multimediaencyclopediagui.images.IOIndexed;
+import com.ite.multimediaencyclopediagui.images.ImageUtils;
+import com.ite.multimediaencyclopediagui.images.IndexedImage;
+import com.ite.multimediaencyclopediagui.images.Pixel;
+
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;

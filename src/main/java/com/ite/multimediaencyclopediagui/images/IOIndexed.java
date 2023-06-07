@@ -139,6 +139,7 @@ public class IOIndexed {
             finalImage.colorPercentage[i] = colorPercentageMap.elementAt(i);
         }
 
+        sourceImageData.close();
         return finalImage;
     }
 

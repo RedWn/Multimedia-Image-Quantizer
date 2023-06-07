@@ -1,10 +1,13 @@
 package com.ite.multimediaencyclopediagui.search;
 
+import com.ite.multimediaencyclopediagui.images.Algorithms.MedianCutAlgorithm;
 import com.ite.multimediaencyclopediagui.images.IOIndexed;
 import com.ite.multimediaencyclopediagui.images.ImageUtils;
 import com.ite.multimediaencyclopediagui.images.IndexedImage;
 import com.ite.multimediaencyclopediagui.images.Pixel;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -103,13 +106,9 @@ public class Searcher {
     }
 
     public static void setTarget(File imageToSearchFor, int nColors) throws IOException {
-        //a good question is should we choose the wanted colors automatically or should we give the user the choice?
-        //I have no evidence this will make a difference if you are using more than 1 color!
-//        BufferedImage BI = ImageIO.read(imageToSearchFor);
-//        IOIndexed.writeIndexed(BI,"temp.rii");
-        IndexedImage II = IOIndexed.readIndexedImageFromDisk(imageToSearchFor.getAbsolutePath());
-//        IndexedImage II = IOIndexed.convertImageToIndexed(BI);
-//        IndexedImage II = IOIndexed.readIndexedImageFromDisk(imageToSearchFor.getAbsolutePath());
+        BufferedImage BI = ImageIO.read(imageToSearchFor);
+        IOIndexed.convertImageToIndexedAndWriteToDisk(ImageUtils.PixelsToImage(MedianCutAlgorithm.GetQuantizedPixels(ImageUtils.ImageToPixels(BI),64),BI.getWidth(),BI.getHeight(), BI.getType()),"temp.rii");
+        IndexedImage II = IOIndexed.readIndexedImageFromDisk("temp.rii");
         int maxIndex = 0;
 
         Vector<Integer> taken = new Vector<>();

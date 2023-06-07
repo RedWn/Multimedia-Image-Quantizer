@@ -73,12 +73,6 @@ public class Main extends Application {
     }
 
     private Scene getMainAlgorithmScene() {
-        Image placeholderImage = new Image("default_image.png");
-
-        imageViewOriginal.setImage(placeholderImage);
-        imageViewFirstAlgo.setImage(placeholderImage);
-        imageViewSecondAlgo.setImage(placeholderImage);
-
         imageViewOriginal.setPreserveRatio(true);
         imageViewFirstAlgo.setPreserveRatio(true);
         imageViewSecondAlgo.setPreserveRatio(true);

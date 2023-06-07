@@ -219,9 +219,11 @@ public class Main extends Application {
 
         Button uploadSearchImageButton = new Button("Choose an image to search for");
         uploadSearchImageButton.setOnAction(e -> {
+
             File chosenFile = fileChooser.showOpenDialog(window);
             if (chosenFile == null) return;
 
+            searchResultsGridPane.getChildren().clear();
             searchStatusLabel.setText("Loading...");
 
             try {

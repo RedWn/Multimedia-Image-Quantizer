@@ -4,6 +4,7 @@ import com.ite.multimediaencyclopediagui.images.Algorithms.LloydsAlgorithm;
 import com.ite.multimediaencyclopediagui.images.Algorithms.MedianCutAlgorithm;
 import com.ite.multimediaencyclopediagui.images.*;
 import javafx.application.Application;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -43,6 +44,28 @@ public class HelloApplication extends Application {
     private Label searchResultsLabel;
     private final Scene mainAlgorithmScene = this.getMainAlgorithmScene();
     private final Scene searchScene = this.getSearchScene();
+    private ListView<String> folderListView;
+    private void browseFolders() {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("Choose Search Folders");
+        File selectedDirectory = directoryChooser.showDialog(null);
+
+        if (selectedDirectory != null) {
+            folderListView.getItems().add(selectedDirectory.getAbsolutePath());
+        }
+    }
+
+    private ObservableList<String> search() {
+        // Retrieve the selected folders
+        ObservableList<String> selectedFolders = folderListView.getItems();
+
+        // Perform search operation on the selected folders
+        for (String folder : selectedFolders) {
+            System.out.println("Searching in folder: " + folder);
+            // Perform your search logic here
+        }
+        return selectedFolders;
+    }
 
     public static void main(String[] args) {
         launch();
@@ -50,6 +73,9 @@ public class HelloApplication extends Application {
 
     @Override
     public void start(Stage stage) {
+
+
+
         window = stage;
         window.setTitle("Multimedia Project");
         window.setMinWidth(1000);
@@ -166,6 +192,7 @@ public class HelloApplication extends Application {
         Button gotoSearchScene = new Button("Search for images");
         gotoSearchScene.setOnAction(e -> {
             window.setScene(searchScene);
+
         });
 
 
@@ -189,6 +216,9 @@ public class HelloApplication extends Application {
     }
 
     private Scene getSearchScene() {
+        folderListView = new ListView<>();
+        folderListView.setMaxSize(600,100);
+        folderListView.scrollTo(10);
         FileChooser searchImageChooser = new FileChooser();
 
         Button gotoMainAlgorithmScene = new Button("Go Back");
@@ -209,49 +239,62 @@ public class HelloApplication extends Application {
         searchResultsLabel = new Label();
         searchResultsLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: 700;");
 
-        uploadSearchImageButton.setOnAction(e -> {
+        uploadSearchImageButton.setOnAction(e ->
+        {
+
             File chosenFile = searchImageChooser.showOpenDialog(window);
             if (chosenFile == null) return;
             searchResultsLabel.setText("Loading...");
 
             try {
+                search();
                 Searcher.setTarget(chosenFile, 10);
                 System.out.print("Searching for images similar to ");
                 System.out.print(chosenFile.getName());
                 System.out.println();
-                File[] foundFiles = Searcher.Search(resultsDirectory);
-
-                if (foundFiles.length == 0) {
-                    searchResultsLabel.setText("No similar images were found.");
-                } else {
-                    searchResultsLabel.setText("Search done. Found " + foundFiles.length + " files.");
+                Vector<File[]> foundFiles = new Vector();
+                for (String folder : folderListView.getItems()) {
+                    foundFiles.add(Searcher.Search(folder));
+                    // Perform your search logic here
                 }
 
-                for (int i = 0; i < foundFiles.length; i++) {
-                    System.out.println(foundFiles[i].getAbsolutePath());
 
-                    IndexedImage imageMatch = IOIndexed.readIndexedImageFromDisk(foundFiles[i].getAbsolutePath());
-                    BufferedImage bufferedImageMatch = ImageUtils.PixelsToImage(imageMatch.pixels, imageMatch.width, imageMatch.height, 2);
-                    Image nonBufferedImageMatch = ImageUtils.ConvertBufferedImageToImage(bufferedImageMatch);
+                if (foundFiles.size() == 0) {
+                    searchResultsLabel.setText("No similar images were found.");
+                } else {
+                    searchResultsLabel.setText("Search done. Found " + foundFiles.size() + " files.");
+                }
 
-                    VBox box = new VBox();
-                    box.setAlignment(Pos.BOTTOM_CENTER);
-                    box.setSpacing(5);
+                for (int i = 0; i < foundFiles.size(); i++) {
+                    for (int j=0; j<foundFiles.elementAt(i).length; j++) {
 
-                    ImageView imageView = new ImageView();
-                    imageView.setImage(nonBufferedImageMatch);
-                    imageView.setPreserveRatio(true);
-                    imageView.setFitWidth(200);
-                    imageView.setFitHeight(200);
 
-                    int col = searchResultsGridPane.getChildren().size() % MAX_GRIDPANE_COLUMNS;
-                    int row = searchResultsGridPane.getChildren().size() / MAX_GRIDPANE_ROWS;
+                        System.out.println(foundFiles.elementAt(i)[j].getAbsolutePath());
 
-                    Text filePathText = new Text(foundFiles[i].getAbsolutePath());
-                    box.getChildren().addAll(imageView, filePathText);
 
-                    // SPECIFY COLUMN THEN ROW
-                    searchResultsGridPane.add(box, col, row);
+                        IndexedImage imageMatch = IOIndexed.readIndexedImageFromDisk(foundFiles.elementAt(i)[j].getAbsolutePath());
+                        BufferedImage bufferedImageMatch = ImageUtils.PixelsToImage(imageMatch.pixels, imageMatch.width, imageMatch.height, 2);
+                        Image nonBufferedImageMatch = ImageUtils.ConvertBufferedImageToImage(bufferedImageMatch);
+
+                        VBox box = new VBox();
+                        box.setAlignment(Pos.BOTTOM_CENTER);
+                        box.setSpacing(5);
+
+                        ImageView imageView = new ImageView();
+                        imageView.setImage(nonBufferedImageMatch);
+                        imageView.setPreserveRatio(true);
+                        imageView.setFitWidth(200);
+                        imageView.setFitHeight(200);
+
+                        int col = searchResultsGridPane.getChildren().size() % MAX_GRIDPANE_COLUMNS;
+                        int row = searchResultsGridPane.getChildren().size() / MAX_GRIDPANE_ROWS;
+
+                        Text filePathText = new Text(foundFiles.elementAt(i)[j].getAbsolutePath());
+                        box.getChildren().addAll(imageView, filePathText);
+
+                        // SPECIFY COLUMN THEN ROW
+                        searchResultsGridPane.add(box, col, row);
+                    }
                 }
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
@@ -262,7 +305,7 @@ public class HelloApplication extends Application {
         Text chosenSearchDirectoriesTextNode = new Text();
 
         Button chooseSearchDirectoriesButton = new Button("Select search directories");
-        chooseSearchDirectoriesButton.setOnAction(e -> {
+        chooseSearchDirectoriesButton.setOnAction(e -> browseFolders()/*{
             File searchDirFile = directoryChooser.showDialog(window);
             if (searchDirFile == null) return;
 
@@ -275,12 +318,12 @@ public class HelloApplication extends Application {
             });
 
             chosenSearchDirectoriesTextNode.setText(chosenSearchDirectoriesString.toString());
-        });
+        }*/);
 
         VBox searchSceneContainer = new VBox();
         searchSceneContainer.setAlignment(Pos.CENTER);
         searchSceneContainer.setSpacing(15);
-        searchSceneContainer.getChildren().addAll(chooseSearchDirectoriesButton, chosenSearchDirectoriesTextNode, uploadSearchImageButton, loading(chosenSearchDirectories), searchResultsLabel, searchResultsGridPane, gotoMainAlgorithmScene);
+        searchSceneContainer.getChildren().addAll(chooseSearchDirectoriesButton, folderListView, chosenSearchDirectoriesTextNode, uploadSearchImageButton, loading(chosenSearchDirectories), searchResultsLabel, searchResultsGridPane, gotoMainAlgorithmScene);
 
         ScrollPane searchScrollPane = new ScrollPane();
         searchScrollPane.setFitToWidth(true);

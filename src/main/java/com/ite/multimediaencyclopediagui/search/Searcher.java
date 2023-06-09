@@ -12,19 +12,19 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Vector;
 
 public class Searcher {
     public static float colorThreshold = 5f;
     public static float percentageThreshold = 0.005f;
-    static Vector<SearchColor> colors;
+    static ArrayList<SearchColor> colors;
     public static int loadingNumber = 0;
 
     public static File[] Search(String directory) throws IOException {
         File FF = new File(directory);
-        Vector<File> ans = new Vector<>();
+        ArrayList<File> ans = new ArrayList<>();
 
         if (FF.isDirectory()) {
             for (File F : Objects.requireNonNull(FF.listFiles())) {
@@ -39,7 +39,7 @@ public class Searcher {
         }
         File[] ansArray = new File[ans.size()];
         for (int i = 0; i < ansArray.length; i++) {
-            ansArray[i] = ans.elementAt(i);
+            ansArray[i] = ans.get(i);
         }
         return ansArray;
     }
@@ -53,8 +53,8 @@ public class Searcher {
         dis.skipBytes(width * height);
         boolean getOut = false;
         int buffer;
-        Vector<Pixel> colors = new Vector<>();
-        Vector<Float> percentages = new Vector<>();
+        ArrayList<Pixel> colors = new ArrayList<>();
+        ArrayList<Float> percentages = new ArrayList<>();
         while (true) {
             int[] temp = new int[3];
             for (int j = 0; j < 3; j++) {
@@ -96,11 +96,11 @@ public class Searcher {
         return Math.abs(c1 - c2) < percentageThreshold;
     }
 
-    static float getAllSimilarColorsPercentages(Vector<Pixel> colors,Vector<Float> percentages,int index){
+    static float getAllSimilarColorsPercentages(ArrayList<Pixel> colors,ArrayList<Float> percentages,int index){
         float ans = 0;
         for (int i=0;i<colors.size();i++) {
-            if (areColorsClose(ImageUtils.RGBtoCIELAB(colors.elementAt(i).RGB),ImageUtils.RGBtoCIELAB(colors.elementAt(index).RGB),5))
-                ans += percentages.elementAt(i);
+            if (areColorsClose(ImageUtils.RGBtoCIELAB(colors.get(i).RGB),ImageUtils.RGBtoCIELAB(colors.get(index).RGB),5))
+                ans += percentages.get(i);
         }
         return ans;
     }
@@ -111,7 +111,7 @@ public class Searcher {
         IndexedImage II = IOIndexed.readIndexedImageFromDisk("temp.rii");
         int maxIndex = 0;
 
-        Vector<Integer> taken = new Vector<>();
+        ArrayList<Integer> taken = new ArrayList<>();
 
         while (nColors != 0) {
             float max = Float.MIN_VALUE;
@@ -126,9 +126,9 @@ public class Searcher {
             taken.add(maxIndex);
             nColors--;
         }
-        colors = new Vector<>();
-        Vector<Pixel> temp = new Vector<>(List.of(II.colors));
-        Vector<Float> temp2 = new Vector<>(List.of(II.colorPercentage));
+        colors = new ArrayList<>();
+        ArrayList<Pixel> temp = new ArrayList<>(List.of(II.colors));
+        ArrayList<Float> temp2 = new ArrayList<>(List.of(II.colorPercentage));
         for (int index : taken) {
             colors.add(new SearchColor(II.colors[index].RGB, getAllSimilarColorsPercentages(temp,temp2,index)));
         }

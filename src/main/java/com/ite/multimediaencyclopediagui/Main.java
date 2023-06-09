@@ -30,7 +30,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Vector;
+import java.util.ArrayList;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -236,7 +236,7 @@ public class Main extends Application {
                 int numberOfSearchThreads = folderListView.getItems().size();
                 ExecutorService executor = Executors.newFixedThreadPool(numberOfSearchThreads);
 
-                Vector<File> foundFiles = new Vector<>();
+                ArrayList<File> foundFiles = new ArrayList<>();
 
                 for (String folder : folderListView.getItems()) {
                     Callable<File[]> callable = new SearchTask(folder);
@@ -289,7 +289,7 @@ public class Main extends Application {
             }
         });
 
-        Vector<File> chosenSearchDirectories = new Vector<>();
+        ArrayList<File> chosenSearchDirectories = new ArrayList<>();
         Text chosenSearchDirectoriesTextNode = new Text();
 
         Button chooseSearchDirectoriesButton = new Button("Select search directories");
@@ -385,7 +385,7 @@ public class Main extends Application {
         return hBoxColorsRadioButtons;
     }
 
-    private VBox getLoadingBox(Vector<File> chosenSearchDirectories) {
+    private VBox getLoadingBox(ArrayList<File> chosenSearchDirectories) {
         // Create a progress bar and a progress indicator
         ProgressBar pb = new ProgressBar();
         ProgressIndicator pi = new ProgressIndicator();
@@ -400,7 +400,7 @@ public class Main extends Application {
                 // Update the progress and the message every second
                 int numberOfFiles = 0;
                 for (int i = 0; i < chosenSearchDirectories.size(); i++) {
-                    numberOfFiles += FileUtils.getNumberOfFilesInDirectory(chosenSearchDirectories.elementAt(i).toString());
+                    numberOfFiles += FileUtils.getNumberOfFilesInDirectory(chosenSearchDirectories.get(i).toString());
                 }
                 while (Searcher.loadingNumber < numberOfFiles) {
                     updateProgress(Searcher.loadingNumber + 1, numberOfFiles);

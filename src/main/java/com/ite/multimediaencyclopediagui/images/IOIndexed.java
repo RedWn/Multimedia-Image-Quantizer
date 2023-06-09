@@ -2,9 +2,9 @@ package com.ite.multimediaencyclopediagui.images;
 
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Vector;
 
 public class IOIndexed {
     /**
@@ -86,8 +86,8 @@ public class IOIndexed {
         finalImage.pixels = new Pixel[sourceImageWidth * sourceImageHeight];
 
         // TODO: Convert to actual map
-        Vector<Pixel> colorsMap = new Vector<>();
-        Vector<Float> colorPercentageMap = new Vector<>();
+        ArrayList<Pixel> colorsMap = new ArrayList<>();
+        ArrayList<Float> colorPercentageMap = new ArrayList<>();
 
         // Skip all color indices and reach for the actual colors map which contains rgb values
         sourceImageData.skipBytes(finalImage.pixels.length);
@@ -123,20 +123,20 @@ public class IOIndexed {
             temp.index = i; //this is the index of the pixel in the context of the image
 
             int colorIndex = sourceImageDataForSecondPass.readUnsignedByte();
-            temp.RGB = colorsMap.elementAt(colorIndex).RGB;
+            temp.RGB = colorsMap.get(colorIndex).RGB;
             finalImage.pixels[i] = temp;
         }
 
         finalImage.colors = new Pixel[colorsMap.size()];
 
         for (int i = 0; i < colorsMap.size(); i++) {
-            finalImage.colors[i] = colorsMap.elementAt(i);
+            finalImage.colors[i] = colorsMap.get(i);
         }
 
         finalImage.colorPercentage = new Float[colorPercentageMap.size()];
 
         for (int i = 0; i < colorPercentageMap.size(); i++) {
-            finalImage.colorPercentage[i] = colorPercentageMap.elementAt(i);
+            finalImage.colorPercentage[i] = colorPercentageMap.get(i);
         }
 
         sourceImageData.close();

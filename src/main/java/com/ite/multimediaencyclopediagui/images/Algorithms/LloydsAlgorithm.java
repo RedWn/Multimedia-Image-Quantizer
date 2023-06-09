@@ -2,17 +2,17 @@ package com.ite.multimediaencyclopediagui.images.Algorithms;
 
 import com.ite.multimediaencyclopediagui.images.Pixel;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.Vector;
 
 public class LloydsAlgorithm {
     public static Pixel[] GetQuantizedPixels(Pixel[] imagePixels, int nColors) {
         int[][] kMeans = new int[nColors][];
-        Vector<Pixel>[] kGroups = new Vector[nColors];
+        ArrayList<Pixel>[] kGroups = new ArrayList[nColors];
         boolean done = false;
         Pixel[] ans = new Pixel[imagePixels.length];
-        int[] avg = getGroupCenter(new Vector<>(List.of(imagePixels)));
+        int[] avg = getGroupCenter(new ArrayList<>(List.of(imagePixels)));
         Random rand = new Random();
         for (int i = 0; i < kMeans.length; i++) {
             int[] temp = new int[3];
@@ -24,7 +24,7 @@ public class LloydsAlgorithm {
         while (!done) {
             done = true;
             for (int i = 0; i < kGroups.length; i++) {
-                kGroups[i] = new Vector<>();
+                kGroups[i] = new ArrayList<>();
             }
             int group = 0;
             for (Pixel imagePixel : imagePixels) {
@@ -65,7 +65,7 @@ public class LloydsAlgorithm {
         return (int) Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2) + Math.pow(a[2] - b[2], 2));
     }
 
-    private static int[] getGroupCenter(Vector<Pixel> group) {
+    private static int[] getGroupCenter(ArrayList<Pixel> group) {
         int[] ans = new int[3];
         for (Pixel pixel : group) {
             ans[0] += pixel.RGB[0];

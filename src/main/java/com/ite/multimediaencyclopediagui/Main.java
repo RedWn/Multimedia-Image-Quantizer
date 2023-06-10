@@ -27,6 +27,7 @@ import javafx.stage.Stage;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -55,7 +56,6 @@ public class Main extends Application {
     private final Scene mainAlgorithmScene = this.getMainAlgorithmScene();
     private final Scene searchScene = this.getSearchScene();
     private ListView<String> folderListView;
-
 
     public static void main(String[] args) {
         launch();
@@ -214,7 +214,7 @@ public class Main extends Application {
         int MAX_GRIDPANE_COLUMNS = 4;
         int MAX_GRIDPANE_ROWS = 4;
 
-        searchStatusLabel = new Label();
+        searchStatusLabel = new Label(" ");
         searchStatusLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: 700;");
 
         Button uploadSearchImageButton = new Button("Choose an image to search for");
@@ -227,9 +227,7 @@ public class Main extends Application {
             searchStatusLabel.setText("Loading...");
 
             try {
-                System.out.print("Searching for images similar to ");
-                System.out.print(chosenFile.getName());
-                System.out.println();
+                System.out.println("Searching for images similar to " + chosenFile.getName());
 
                 Searcher.setTarget(chosenFile, 10);
 
@@ -244,12 +242,6 @@ public class Main extends Application {
                     for (File file : future.get()) {
                         foundFiles.add(file);
                     }
-                }
-
-                if (foundFiles.size() == 0) {
-                    searchStatusLabel.setText("No similar images were found.");
-                } else {
-                    searchStatusLabel.setText("Search done. Found " + foundFiles.size() + " files.");
                 }
 
                 foundFiles.forEach(file -> {
@@ -284,6 +276,11 @@ public class Main extends Application {
                     // SPECIFY COLUMN THEN ROW
                     searchResultsGridPane.add(box, col, row);
                 });
+                if (foundFiles.size() == 0) {
+                    searchStatusLabel.setText("No similar images were found.");
+                } else {
+                    searchStatusLabel.setText("Search done. Found " + foundFiles.size() + " files.");
+                }
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
@@ -309,7 +306,7 @@ public class Main extends Application {
                 folderListView,
                 chosenSearchDirectoriesTextNode,
                 uploadSearchImageButton,
-                getLoadingBox(chosenSearchDirectories),
+                //getLoadingBox(chosenSearchDirectories),
                 searchStatusLabel,
                 searchResultsGridPane,
                 gotoMainAlgorithmScene);
@@ -386,9 +383,7 @@ public class Main extends Application {
     }
 
     private VBox getLoadingBox(ArrayList<File> chosenSearchDirectories) {
-        // Create a progress bar and a progress indicator
         ProgressBar pb = new ProgressBar();
-        ProgressIndicator pi = new ProgressIndicator();
 
         // Create a label to show the status of the task
         Label statusLabel = new Label("Status: ");
@@ -405,40 +400,37 @@ public class Main extends Application {
                 while (Searcher.loadingNumber < numberOfFiles) {
                     updateProgress(Searcher.loadingNumber + 1, numberOfFiles);
                     updateMessage("Working... (" + (Searcher.loadingNumber + 1) + "/" + numberOfFiles + ")");
-                    Thread.sleep(500);
+                    Thread.sleep(50);
                 }
                 // Update the message when the task is done
-                updateMessage("Done!");
+                updateMessage(" ");
                 return null;
             }
         };
 
         // Bind the progress property of the controls to the progress property of the task
         pb.progressProperty().bind(task.progressProperty());
-        pi.progressProperty().bind(task.progressProperty());
 
         // Bind the text property of the label to the message property of the task
         statusLabel.textProperty().bind(task.messageProperty());
 
-        HBox hb = new HBox();
-        hb.setSpacing(10);
-        hb.setAlignment(Pos.CENTER);
-        hb.getChildren().addAll(pb, pi);
-
-        VBox vb = new VBox();
-        vb.setSpacing(10);
-        vb.setAlignment(Pos.CENTER);
-        vb.getChildren().addAll(hb, statusLabel);
-        if (!searchStatusLabel.toString().equals("Loading...")) {
-            vb.setVisible(false);
+        VBox loadingBarVBox = new VBox();
+        loadingBarVBox.setSpacing(5);
+        loadingBarVBox.setAlignment(Pos.CENTER);
+        loadingBarVBox.getChildren().addAll(pb, statusLabel);
+        if (searchStatusLabel.toString() != "Loading...") {
+            loadingBarVBox.setVisible(true);
         }
         searchStatusLabel.textProperty().addListener((observable, oldValue, newValue) -> {
             // Do something when the label text changes
             if (newValue.equals("Loading...")) {
+                loadingBarVBox.setVisible(true);
                 new Thread(task).start();
-                vb.setVisible(true);
+            }
+            else {
+                loadingBarVBox.setVisible(false);
             }
         });
-        return vb;
+        return loadingBarVBox;
     }
 }

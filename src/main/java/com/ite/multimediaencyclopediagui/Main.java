@@ -27,7 +27,6 @@ import javafx.stage.Stage;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -44,22 +43,18 @@ public class Main extends Application {
     static ImageView imageViewSecondAlgo = new ImageView();
     static RadioButton colorsSelectedToggle = new RadioButton();
     static RadioButton algorithmSelectedToggle = new RadioButton();
-
+    private final DirectoryChooser directoryChooser = new DirectoryChooser();
+    private final FileChooser fileChooser = new FileChooser();
     /**
      * Directory where images are stored after applying the algorithm.
      */
     private String resultsDirectory = "D:\\";
-
-    private final DirectoryChooser directoryChooser = new DirectoryChooser();
-    private final FileChooser fileChooser = new FileChooser();
     private Label searchStatusLabel;
-    private final Scene mainAlgorithmScene = this.getMainAlgorithmScene();
-    private final Scene searchScene = this.getSearchScene();
-    private ListView<String> folderListView;
+    private ListView<String> folderListView;    private final Scene mainAlgorithmScene = this.getMainAlgorithmScene();
 
     public static void main(String[] args) {
         launch();
-    }
+    }    private final Scene searchScene = this.getSearchScene();
 
     @Override
     public void start(Stage stage) {
@@ -428,11 +423,14 @@ public class Main extends Application {
             if (newValue.equals("Loading...")) {
                 loadingBarVBox.setVisible(true);
                 new Thread(task).start();
-            }
-            else {
+            } else {
                 loadingBarVBox.setVisible(false);
             }
         });
         return loadingBarVBox;
     }
+
+
+
+
 }

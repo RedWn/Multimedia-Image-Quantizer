@@ -54,7 +54,7 @@ public class IOIndexed {
             dos.writeByte(colorsMap.get(colorRGBValue));
         }
 
-        for (int i = 0; i < colorsMap.size(); i++){
+        for (int i = 0; i < colorsMap.size(); i++) {
             int colorIndexInMap = getKeyFromValue(colorsMap, i); //this solution is shit, but I don't see another way
             Pixel pixel = ImageUtils.convertRGBValueToPixel(colorIndexInMap);
             dos.writeShort(pixel.RGB[0]);
@@ -102,7 +102,7 @@ public class IOIndexed {
 
         finalImage.colors = new Pixel[colorsMap.size()];
         finalImage.colorPercentage = new Float[colorsMap.size()];
-        for (int i = 0; i < colorsMap.size(); i++){
+        for (int i = 0; i < colorsMap.size(); i++) {
             int colorIndexInMap = getKeyFromValue(colorsMap, i); //this solution is shit, but I don't see another way
             Pixel pixel = ImageUtils.convertRGBValueToPixel(colorIndexInMap);
             finalImage.colors[i] = pixel;

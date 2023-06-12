@@ -229,7 +229,9 @@ public class Main extends Application {
             try {
                 System.out.println("Searching for images similar to " + chosenFile.getName());
 
-                Searcher.setTarget(chosenFile, 10);
+                Searcher.setColorTarget(chosenFile, 10);
+                Searcher.setDateTarget(chosenFile);
+                Searcher.setSizeTarget(chosenFile);
 
                 int numberOfSearchThreads = folderListView.getItems().size();
                 ExecutorService executor = Executors.newFixedThreadPool(numberOfSearchThreads);

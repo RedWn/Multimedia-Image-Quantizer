@@ -12,6 +12,6 @@ public class SearchTask implements Callable {
     }
 
     public File[] call() throws IOException {
-        return Searcher.Search(directory);
+        return Searcher.Search(directory,true,true,true);
     }
 }

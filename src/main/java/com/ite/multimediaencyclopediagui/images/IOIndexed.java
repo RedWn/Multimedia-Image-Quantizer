@@ -68,6 +68,50 @@ public class IOIndexed {
         dos.close();
     }
 
+    public static IndexedImage convertImageToIndexed(BufferedImage BI, String fileName) throws IOException {
+        IndexedImage finalImage = new IndexedImage();
+
+        finalImage.width = BI.getWidth();
+        finalImage.height = BI.getHeight();
+        finalImage.pixels = new Pixel[finalImage.width * finalImage.height];
+
+
+        // Since we're reading only quantized images, the number of total colors
+        // cannot exceed 256
+        int[] colorOccurrences = new int[256];
+
+        // key: color RGB value (int)
+        // value: index (int)
+        HashMap<Integer, Integer> colorsMap = new HashMap<>();
+        int incrementalColorIndex = 0;
+
+        for (int i = 0; i < BI.getWidth() * BI.getHeight(); i++) {
+            int colorRGBValue = BI.getRGB(i % BI.getWidth(), i / BI.getWidth());
+
+            if (!colorsMap.containsKey(colorRGBValue)) {
+                colorsMap.put(colorRGBValue, incrementalColorIndex);
+                incrementalColorIndex++;
+            }
+
+            int colorIndex = colorsMap.get(colorRGBValue);
+            colorOccurrences[colorIndex]++;
+
+            finalImage.pixels[i] = ImageUtils.convertRGBValueToPixel(colorRGBValue);
+            finalImage.pixels[i].index = i;
+        }
+
+        finalImage.colors = new Pixel[colorsMap.size()];
+        finalImage.colorPercentage = new Float[colorsMap.size()];
+        for (int i = 0; i < colorsMap.size(); i++){
+            int colorIndexInMap = getKeyFromValue(colorsMap, i); //this solution is shit, but I don't see another way
+            Pixel pixel = ImageUtils.convertRGBValueToPixel(colorIndexInMap);
+            finalImage.colors[i] = pixel;
+            float colorPercentageInMap = (float) (colorOccurrences[i]) / (BI.getWidth() * BI.getHeight());
+            finalImage.colorPercentage[i] = colorPercentageInMap;
+        }
+        return finalImage;
+    }
+
     public static IndexedImage readIndexedImageFromDisk(String fileName) throws IOException {
         DataInputStream sourceImageData = new DataInputStream(new FileInputStream(fileName));
         DataInputStream sourceImageDataForSecondPass = new DataInputStream(new FileInputStream(fileName));

@@ -194,8 +194,8 @@ public class Searcher {
             for (int i = 0; i < targetImage.colorPercentage.length; i++) {
                 if (taken.contains(i))
                     continue;
-                if (max > targetImage.colorPercentage[i]) {
-                    max = targetImage.colorPercentage[i];
+                if (max < getAllSimilarColorsPercentages(new ArrayList<>(List.of(targetImage.colors)), new ArrayList<>(List.of(targetImage.colorPercentage)), i)) {
+                    max = getAllSimilarColorsPercentages(new ArrayList<>(List.of(targetImage.colors)), new ArrayList<>(List.of(targetImage.colorPercentage)), i);
                     maxIndex = i;
                 }
             }

@@ -224,7 +224,7 @@ public class Main extends Application {
             try {
                 System.out.println("Searching for images similar to " + chosenFile.getName());
 
-                Searcher.setColorTarget(chosenFile, 10);
+                Searcher.setColorTarget(chosenFile, 2);
                 Searcher.setDateTarget(chosenFile);
                 Searcher.setSizeTarget(chosenFile);
 

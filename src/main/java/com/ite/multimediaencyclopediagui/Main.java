@@ -49,8 +49,7 @@ public class Main extends Application {
      * Directory where images are stored after applying the algorithm.
      */
     private String resultsDirectory = "D:\\";
-    private Label searchStatusLabel;
-    private ListView<String> folderListView;    private final Scene mainAlgorithmScene = this.getMainAlgorithmScene();
+    private final Scene mainAlgorithmScene = this.getMainAlgorithmScene();
 
     public static void main(String[] args) {
         launch();
@@ -194,24 +193,52 @@ public class Main extends Application {
     }
 
     private Scene getSearchScene() {
-        folderListView = new ListView<>();
+        // Choose directories list and button
+        ListView<String> folderListView = new ListView<>();
         folderListView.setMaxSize(600, 100);
         folderListView.scrollTo(10);
 
-        Button gotoMainAlgorithmScene = new Button("Go Back");
-        gotoMainAlgorithmScene.setOnAction(e -> window.setScene(mainAlgorithmScene));
+        Button chooseSearchDirectoriesButton = new Button("Select search directories");
+        chooseSearchDirectoriesButton.setOnAction(e -> {
+            directoryChooser.setTitle("Choose Search Folders");
+            File selectedDirectory = directoryChooser.showDialog(null);
 
+            if (selectedDirectory != null) {
+                folderListView.getItems().add(selectedDirectory.getAbsolutePath());
+            }
+        });
+
+        // Search status label
+        Label searchStatusLabel = new Label(" ");
+        searchStatusLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: 700;");
+
+        // Search results grid
         GridPane searchResultsGridPane = new GridPane();
         searchResultsGridPane.setAlignment(Pos.CENTER);
         searchResultsGridPane.setHgap(10);
         searchResultsGridPane.setVgap(10);
 
-        int MAX_GRIDPANE_COLUMNS = 4;
-        int MAX_GRIDPANE_ROWS = 4;
+        // Search options
+        Text searchOptionsHeadline = new Text("Search options: ");
+        searchOptionsHeadline.setStyle("-fx-font-weight: 700; -fx-font-size: 20px");
 
-        searchStatusLabel = new Label(" ");
-        searchStatusLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: 700;");
+        CheckBox searchByColor = new CheckBox("Search by color");
+        CheckBox searchByDate = new CheckBox("Search by date");
+        CheckBox searchBySize = new CheckBox("Search by size");
 
+        Label daysLabel = new Label("Select date days I really dont know what this field does.");
+        daysLabel.setStyle("-fx-font-weight: 600;");
+
+        TextField daysTextField = new TextField();
+        daysTextField.setMaxWidth(200);
+        daysTextField.setText("5");
+
+        VBox searchOptions = new VBox();
+        searchOptions.setAlignment(Pos.CENTER);
+        searchOptions.setSpacing(10);
+        searchOptions.getChildren().addAll(searchOptionsHeadline, searchByColor, searchByDate, searchBySize, daysLabel, daysTextField);
+
+        // Upload image button
         Button uploadSearchImageButton = new Button("Choose an image to search for");
         uploadSearchImageButton.setOnAction(e -> {
 
@@ -228,20 +255,22 @@ public class Main extends Application {
                 Searcher.setDateTarget(chosenFile);
                 Searcher.setSizeTarget(chosenFile);
 
+                Searcher.nDays = Integer.parseInt(daysTextField.getText());
+
                 int numberOfSearchThreads = folderListView.getItems().size();
                 ExecutorService executor = Executors.newFixedThreadPool(numberOfSearchThreads);
 
-                ArrayList<File> foundFiles = new ArrayList<>();
+                ArrayList<File> searchResults = new ArrayList<>();
 
                 for (String folder : folderListView.getItems()) {
-                    Callable<File[]> callable = new SearchTask(folder);
+                    Callable<File[]> callable = new SearchTask(folder, searchByColor.isSelected(), searchByDate.isSelected(), searchBySize.isSelected());
                     Future<File[]> future = executor.submit(callable);
                     for (File file : future.get()) {
-                        foundFiles.add(file);
+                        searchResults.add(file);
                     }
                 }
 
-                foundFiles.forEach(file -> {
+                searchResults.forEach(file -> {
                     System.out.println(file.getAbsolutePath());
 
                     IndexedImage imageMatch = null;
@@ -264,6 +293,9 @@ public class Main extends Application {
                     imageView.setFitWidth(200);
                     imageView.setFitHeight(200);
 
+                    int MAX_GRIDPANE_COLUMNS = 4;
+                    int MAX_GRIDPANE_ROWS = 4;
+
                     int col = searchResultsGridPane.getChildren().size() % MAX_GRIDPANE_COLUMNS;
                     int row = searchResultsGridPane.getChildren().size() / MAX_GRIDPANE_ROWS;
 
@@ -273,41 +305,34 @@ public class Main extends Application {
                     // SPECIFY COLUMN THEN ROW
                     searchResultsGridPane.add(box, col, row);
                 });
-                if (foundFiles.size() == 0) {
+                if (searchResults.size() == 0) {
                     searchStatusLabel.setText("No similar images were found.");
                 } else {
-                    searchStatusLabel.setText("Search done. Found " + foundFiles.size() + " files.");
+                    searchStatusLabel.setText("Search done. Found " + searchResults.size() + " files.");
                 }
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
         });
 
-        ArrayList<File> chosenSearchDirectories = new ArrayList<>();
-        Text chosenSearchDirectoriesTextNode = new Text();
+        Button gotoMainAlgorithmScene = new Button("Go Back");
+        gotoMainAlgorithmScene.setOnAction(e -> window.setScene(mainAlgorithmScene));
 
-        Button chooseSearchDirectoriesButton = new Button("Select search directories");
-        chooseSearchDirectoriesButton.setOnAction(e -> {
-            directoryChooser.setTitle("Choose Search Folders");
-            File selectedDirectory = directoryChooser.showDialog(null);
-
-            if (selectedDirectory != null) {
-                folderListView.getItems().add(selectedDirectory.getAbsolutePath());
-            }
-        });
-
+        // Final box
         VBox searchSceneContainer = new VBox();
         searchSceneContainer.setAlignment(Pos.CENTER);
         searchSceneContainer.setSpacing(15);
-        searchSceneContainer.getChildren().addAll(chooseSearchDirectoriesButton,
+        searchSceneContainer.getChildren().addAll(
+                searchOptions,
+                chooseSearchDirectoriesButton,
                 folderListView,
-                chosenSearchDirectoriesTextNode,
                 uploadSearchImageButton,
                 //getLoadingBox(chosenSearchDirectories),
                 searchStatusLabel,
                 searchResultsGridPane,
                 gotoMainAlgorithmScene);
 
+        // Final container
         ScrollPane searchScrollPane = new ScrollPane();
         searchScrollPane.setFitToWidth(true);
         searchScrollPane.setFitToHeight(true);
@@ -379,56 +404,56 @@ public class Main extends Application {
         return hBoxColorsRadioButtons;
     }
 
-    private VBox getLoadingBox(ArrayList<File> chosenSearchDirectories) {
-        ProgressBar pb = new ProgressBar();
-
-        // Create a label to show the status of the task
-        Label statusLabel = new Label("Status: ");
-
-        // Create a task that simulates some work
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                // Update the progress and the message every second
-                int numberOfFiles = 0;
-                for (int i = 0; i < chosenSearchDirectories.size(); i++) {
-                    numberOfFiles += FileUtils.getNumberOfFilesInDirectory(chosenSearchDirectories.get(i).toString());
-                }
-                while (Searcher.loadingNumber < numberOfFiles) {
-                    updateProgress(Searcher.loadingNumber + 1, numberOfFiles);
-                    updateMessage("Working... (" + (Searcher.loadingNumber + 1) + "/" + numberOfFiles + ")");
-                    Thread.sleep(50);
-                }
-                // Update the message when the task is done
-                updateMessage(" ");
-                return null;
-            }
-        };
-
-        // Bind the progress property of the controls to the progress property of the task
-        pb.progressProperty().bind(task.progressProperty());
-
-        // Bind the text property of the label to the message property of the task
-        statusLabel.textProperty().bind(task.messageProperty());
-
-        VBox loadingBarVBox = new VBox();
-        loadingBarVBox.setSpacing(5);
-        loadingBarVBox.setAlignment(Pos.CENTER);
-        loadingBarVBox.getChildren().addAll(pb, statusLabel);
-        if (searchStatusLabel.toString() != "Loading...") {
-            loadingBarVBox.setVisible(true);
-        }
-        searchStatusLabel.textProperty().addListener((observable, oldValue, newValue) -> {
-            // Do something when the label text changes
-            if (newValue.equals("Loading...")) {
-                loadingBarVBox.setVisible(true);
-                new Thread(task).start();
-            } else {
-                loadingBarVBox.setVisible(false);
-            }
-        });
-        return loadingBarVBox;
-    }
+//    private VBox getLoadingBox(ArrayList<File> chosenSearchDirectories) {
+//        ProgressBar pb = new ProgressBar();
+//
+//        // Create a label to show the status of the task
+//        Label statusLabel = new Label("Status: ");
+//
+//        // Create a task that simulates some work
+//        Task<Void> task = new Task<>() {
+//            @Override
+//            protected Void call() throws Exception {
+//                // Update the progress and the message every second
+//                int numberOfFiles = 0;
+//                for (int i = 0; i < chosenSearchDirectories.size(); i++) {
+//                    numberOfFiles += FileUtils.getNumberOfFilesInDirectory(chosenSearchDirectories.get(i).toString());
+//                }
+//                while (Searcher.loadingNumber < numberOfFiles) {
+//                    updateProgress(Searcher.loadingNumber + 1, numberOfFiles);
+//                    updateMessage("Working... (" + (Searcher.loadingNumber + 1) + "/" + numberOfFiles + ")");
+//                    Thread.sleep(50);
+//                }
+//                // Update the message when the task is done
+//                updateMessage(" ");
+//                return null;
+//            }
+//        };
+//
+//        // Bind the progress property of the controls to the progress property of the task
+//        pb.progressProperty().bind(task.progressProperty());
+//
+//        // Bind the text property of the label to the message property of the task
+//        statusLabel.textProperty().bind(task.messageProperty());
+//
+//        VBox loadingBarVBox = new VBox();
+//        loadingBarVBox.setSpacing(5);
+//        loadingBarVBox.setAlignment(Pos.CENTER);
+//        loadingBarVBox.getChildren().addAll(pb, statusLabel);
+//        if (searchStatusLabel.toString() != "Loading...") {
+//            loadingBarVBox.setVisible(true);
+//        }
+//        searchStatusLabel.textProperty().addListener((observable, oldValue, newValue) -> {
+//            // Do something when the label text changes
+//            if (newValue.equals("Loading...")) {
+//                loadingBarVBox.setVisible(true);
+//                new Thread(task).start();
+//            } else {
+//                loadingBarVBox.setVisible(false);
+//            }
+//        });
+//        return loadingBarVBox;
+//    }
 
 
 

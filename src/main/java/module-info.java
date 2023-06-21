@@ -1,6 +1,7 @@
 module com.ite.multimediaencyclopediagui {
     requires javafx.controls;
     requires javafx.fxml;
+    requires javafx.swing;
 
     requires com.dlsc.formsfx;
     requires java.desktop;

@@ -39,6 +39,8 @@ import java.util.concurrent.Future;
 
 public class Main extends Application {
     static Stage window;
+    public static File croppedImage;
+    static File chosenFile;
     static ImageView imageViewOriginal = new ImageView();
     static ImageView imageViewFirstAlgo = new ImageView();
     static ImageView imageViewSecondAlgo = new ImageView();
@@ -254,9 +256,26 @@ public class Main extends Application {
 
         // Upload image button
         Button uploadSearchImageButton = new Button("Choose an image to search for");
+        Button cropUploadSearchImageButton = new Button("Crop an image");
+        cropUploadSearchImageButton.setOnAction(event ->{
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.getExtensionFilters().add(
+                    new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif"));
+            File imageFile = fileChooser.showOpenDialog(window);
+            Crop crop1 = new Crop();
+            crop1.selectImage(imageFile);
+            //   System.out.println(croppedImage.toString());
+        });
         uploadSearchImageButton.setOnAction(e -> {
 
-            File chosenFile = fileChooser.showOpenDialog(window);
+            if (croppedImage!=null){
+                chosenFile = croppedImage;
+                System.out.println(chosenFile.toString());
+            }
+            else {
+                chosenFile = fileChooser.showOpenDialog(window);
+            }
+
             if (chosenFile == null) return;
 
             searchResultsGridPane.getChildren().clear();
@@ -332,6 +351,10 @@ public class Main extends Application {
         Button gotoMainAlgorithmScene = new Button("Go Back");
         gotoMainAlgorithmScene.setOnAction(e -> window.setScene(mainAlgorithmScene));
 
+        HBox buttonsSearch = new HBox();
+        buttonsSearch.setAlignment(Pos.CENTER);
+        buttonsSearch.setSpacing(15);
+        buttonsSearch.getChildren().addAll(uploadSearchImageButton,cropUploadSearchImageButton);
         // Final box
         VBox searchSceneContainer = new VBox();
         searchSceneContainer.setAlignment(Pos.CENTER);
@@ -340,7 +363,8 @@ public class Main extends Application {
                 searchOptions,
                 chooseSearchDirectoriesButton,
                 folderListView,
-                uploadSearchImageButton,
+               buttonsSearch,
+
                 //getLoadingBox(chosenSearchDirectories),
                 searchStatusLabel,
                 searchResultsGridPane,

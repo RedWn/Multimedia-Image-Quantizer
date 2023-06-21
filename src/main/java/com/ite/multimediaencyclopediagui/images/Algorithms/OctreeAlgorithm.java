@@ -12,7 +12,7 @@ public class OctreeAlgorithm {
         Map<Pixel, Pixel> colorMap = new HashMap<>();
         int depth = 3;
         if (nColors <= 8) {
-//            nColors = 8;
+            nColors = 8;
             depth = 1;
         } else if (nColors <= 64)
             depth = 2;

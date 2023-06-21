@@ -30,4 +30,12 @@ public class FileUtils {
             return fileName.substring(0, index);
         }
     }
+
+    public static  String getFileExtension(String fileName) {
+        int dotIndex = fileName.lastIndexOf('.');
+        if (dotIndex == -1 || dotIndex == fileName.length() - 1) {
+            return "";
+        }
+        return fileName.substring(dotIndex + 1);
+    }
 }

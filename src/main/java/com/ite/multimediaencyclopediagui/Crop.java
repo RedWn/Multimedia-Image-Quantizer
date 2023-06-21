@@ -23,8 +23,7 @@ public class Crop {
     private static Stage cropStage;
     private static Image croppedImage;
 
-    public   void selectImage(File imageFile) {
-
+    public void selectImage(File imageFile) {
         if (imageFile != null) {
             try {
 
@@ -81,7 +80,9 @@ public class Crop {
 
                     croppedImage = cropImage(image, croppedRect);
                     cropStage.close();
-                    Main.croppedImage = saveCroppedImage(window);
+
+                    imageToSearchFor = saveCroppedImage(window);
+                    Main.imageToSearchForImageView.setImage(new Image(imageToSearchFor.toURI().toString()));
 
                 });
                 System.out.println("Test Herehsh");
@@ -93,7 +94,7 @@ public class Crop {
         //  return null;
     }
 
-    private  Image cropImage(Image image, Rectangle2D cropArea) {
+    private Image cropImage(Image image, Rectangle2D cropArea) {
         int x = (int) cropArea.getMinX();
         int y = (int) cropArea.getMinY();
         int width = (int) cropArea.getWidth();
@@ -120,7 +121,7 @@ public class Crop {
 
         File outputFile = fileChooser.showSaveDialog(primaryStage);
         if (outputFile != null) {
-            String fileExtension = getFileExtension(outputFile.getName());
+            String fileExtension = FileUtils.getFileExtension(outputFile.getName());
             try {
                 ImageIO.write(
                         javafx.embed.swing.SwingFXUtils.fromFXImage(croppedImage, null),
@@ -134,14 +135,6 @@ public class Crop {
             }
         }
         return null;
-    }
-
-    private  String getFileExtension(String fileName) {
-        int dotIndex = fileName.lastIndexOf('.');
-        if (dotIndex == -1 || dotIndex == fileName.length() - 1) {
-            return "";
-        }
-        return fileName.substring(dotIndex + 1);
     }
 
     private  void showSaveSuccessDialog() {

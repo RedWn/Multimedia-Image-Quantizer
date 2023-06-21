@@ -10,7 +10,7 @@ import com.ite.multimediaencyclopediagui.images.Pixel;
 import com.ite.multimediaencyclopediagui.search.SearchTask;
 import com.ite.multimediaencyclopediagui.search.Searcher;
 import javafx.application.Application;
-import javafx.concurrent.Task;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -32,6 +32,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -39,8 +41,9 @@ import java.util.concurrent.Future;
 
 public class Main extends Application {
     static Stage window;
-    public static File croppedImage;
-    static File chosenFile;
+    static File imageToSearchFor;
+    static ImageView imageToSearchForImageView = new ImageView();
+
     static ImageView imageViewOriginal = new ImageView();
     static ImageView imageViewFirstAlgo = new ImageView();
     static ImageView imageViewSecondAlgo = new ImageView();
@@ -57,7 +60,9 @@ public class Main extends Application {
 
     public static void main(String[] args) {
         launch();
-    }    private final Scene searchScene = this.getSearchScene();
+    }
+
+    private final Scene searchScene = this.getSearchScene();
 
     @Override
     public void start(Stage stage) {
@@ -169,12 +174,7 @@ public class Main extends Application {
         chooseAlgorithmBox.setAlignment(Pos.CENTER);
         chooseAlgorithmBox.setSpacing(50);
 
-        chooseAlgorithmBox.getChildren().addAll(
-                new Label("Choose an algorithm:"),
-                chooseAlgorithmVBox(),
-                ColorPalette.colorPaletteButton(),
-                Histogram.histogramButton()
-        );
+        chooseAlgorithmBox.getChildren().addAll(new Label("Choose an algorithm:"), chooseAlgorithmVBox(), ColorPalette.colorPaletteButton(), Histogram.histogramButton());
 
         VBox mainAlgorithmBox = new VBox();
         mainAlgorithmBox.setAlignment(Pos.CENTER);
@@ -189,15 +189,7 @@ public class Main extends Application {
         Button gotoSearchScene = new Button("Search for images");
         gotoSearchScene.setOnAction(e -> window.setScene(searchScene));
 
-        mainAlgorithmBox.getChildren().addAll(
-                chooseDirectoryLabel,
-                directoryBox,
-                new Label("Choose how many colors do you want in the new image?"),
-                this.getColorRadioButtonsHBox(),
-                uploadImageButton,
-                chooseAlgorithmBox,
-                gotoSearchScene
-        );
+        mainAlgorithmBox.getChildren().addAll(chooseDirectoryLabel, directoryBox, new Label("Choose how many colors do you want in the new image?"), this.getColorRadioButtonsHBox(), uploadImageButton, chooseAlgorithmBox, gotoSearchScene);
 
         Image backgroundImage = new Image("BG3.jpg", 1000, 500, false, true);
         ImageView backgroundImageView = new ImageView(backgroundImage);
@@ -209,6 +201,12 @@ public class Main extends Application {
     }
 
     private Scene getSearchScene() {
+
+        imageToSearchForImageView.setPreserveRatio(true);
+        imageToSearchForImageView.setFitHeight(200);
+        imageToSearchForImageView.setFitHeight(200);
+
+
         // Choose directories list and button
         ListView<String> folderListView = new ListView<>();
         folderListView.setMaxSize(600, 100);
@@ -242,7 +240,7 @@ public class Main extends Application {
         CheckBox searchByDate = new CheckBox("Search by date");
         CheckBox searchBySize = new CheckBox("Search by size");
 
-        Label daysLabel = new Label("Select date days I really dont know what this field does.");
+        Label daysLabel = new Label("Date");
         daysLabel.setStyle("-fx-font-weight: 600;");
 
         TextField daysTextField = new TextField();
@@ -254,39 +252,85 @@ public class Main extends Application {
         searchOptions.setSpacing(10);
         searchOptions.getChildren().addAll(searchOptionsHeadline, searchByColor, searchByDate, searchBySize, daysLabel, daysTextField);
 
-        // Upload image button
-        Button uploadSearchImageButton = new Button("Choose an image to search for");
-        Button cropUploadSearchImageButton = new Button("Crop an image");
-        cropUploadSearchImageButton.setOnAction(event ->{
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.getExtensionFilters().add(
-                    new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif"));
-            File imageFile = fileChooser.showOpenDialog(window);
-            Crop crop1 = new Crop();
-            crop1.selectImage(imageFile);
-            //   System.out.println(croppedImage.toString());
+        Button compressImageButton = new Button("Compress image");
+
+        TextField widthAfterCompressionTextField = new TextField("Width after compression");
+        TextField heightAfterCompressionTextField = new TextField("Height after compression");
+
+        compressImageButton.setOnAction(e -> {
+            if (imageToSearchFor == null) return;
+
+            BufferedImage originalImage = null;
+            try {
+                originalImage = ImageIO.read(imageToSearchFor);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+
+//            int COMPRESSED_WIDTH = 100;
+            // Compress the image to the desired width while preserving the aspect ratio
+//            double scalingFactor = (double) COMPRESSED_WIDTH / originalImage.getWidth();
+//            int compressedHeight = (int) (originalImage.getHeight() * scalingFactor);
+
+            int compressedWidth = Integer.parseInt(widthAfterCompressionTextField.getText());
+            int compressedHeight = Integer.parseInt(heightAfterCompressionTextField.getText());
+
+            BufferedImage compressedImage = new BufferedImage(compressedWidth, compressedHeight, BufferedImage.TYPE_INT_RGB);
+            compressedImage.createGraphics().drawImage(originalImage.getScaledInstance(compressedWidth, compressedHeight, java.awt.Image.SCALE_SMOOTH), 0, 0, null);
+
+            try {
+                File newImage = new File("D:/temp/bla.test");
+
+                ImageIO.write(
+                        compressedImage,
+                        FileUtils.getFileExtension(imageToSearchFor.getName()),
+                        newImage
+                );
+
+                imageToSearchFor = newImage;
+
+                System.out.println("Writing done");
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+
+            imageToSearchForImageView.setImage(new Image(imageToSearchFor.toURI().toString()));
+
+            System.out.println("🚀 Done compressing!");
         });
+
+        Button cropImageButton = new Button("Crop image");
+
+        cropImageButton.setOnAction(event -> {
+            if (imageToSearchFor != null) {
+                Crop imageCropper = new Crop();
+                imageCropper.selectImage(imageToSearchFor);
+            }
+        });
+
+        Button uploadSearchImageButton = new Button("Upload image");
         uploadSearchImageButton.setOnAction(e -> {
+            imageToSearchFor = fileChooser.showOpenDialog(window);
+            if (imageToSearchFor == null) return;
 
-            if (croppedImage!=null){
-                chosenFile = croppedImage;
-                System.out.println(chosenFile.toString());
-            }
-            else {
-                chosenFile = fileChooser.showOpenDialog(window);
-            }
+            imageToSearchForImageView.setImage(new Image(imageToSearchFor.toURI().toString()));
+        });
 
-            if (chosenFile == null) return;
+        Button searchButton = new Button("Perform search");
+        searchButton.setOnAction(e -> {
+            if (imageToSearchFor == null) return;
+
+            System.out.println("Searching...");
 
             searchResultsGridPane.getChildren().clear();
             searchStatusLabel.setText("Loading...");
 
             try {
-                System.out.println("Searching for images similar to " + chosenFile.getName());
+                System.out.println("Searching for images similar to " + imageToSearchFor.getName());
 
-                Searcher.setColorTarget(chosenFile, 2);
-                Searcher.setDateTarget(chosenFile);
-                Searcher.setSizeTarget(chosenFile);
+                Searcher.setColorTarget(imageToSearchFor, 2);
+                Searcher.setDateTarget(imageToSearchFor);
+                Searcher.setSizeTarget(imageToSearchFor);
 
                 Searcher.nDays = Integer.parseInt(daysTextField.getText());
 
@@ -351,24 +395,22 @@ public class Main extends Application {
         Button gotoMainAlgorithmScene = new Button("Go Back");
         gotoMainAlgorithmScene.setOnAction(e -> window.setScene(mainAlgorithmScene));
 
-        HBox buttonsSearch = new HBox();
-        buttonsSearch.setAlignment(Pos.CENTER);
-        buttonsSearch.setSpacing(15);
-        buttonsSearch.getChildren().addAll(uploadSearchImageButton,cropUploadSearchImageButton);
+        VBox compressionBox = new VBox();
+        compressionBox.getChildren().addAll(widthAfterCompressionTextField, heightAfterCompressionTextField);
+
+        HBox actionButtons = new HBox();
+        actionButtons.setAlignment(Pos.CENTER);
+        actionButtons.setSpacing(15);
+        actionButtons.getChildren().addAll(compressionBox, uploadSearchImageButton, cropImageButton, compressImageButton, searchButton);
+
         // Final box
         VBox searchSceneContainer = new VBox();
         searchSceneContainer.setAlignment(Pos.CENTER);
         searchSceneContainer.setSpacing(15);
-        searchSceneContainer.getChildren().addAll(
-                searchOptions,
-                chooseSearchDirectoriesButton,
-                folderListView,
-               buttonsSearch,
+        searchSceneContainer.getChildren().addAll(imageToSearchForImageView, searchOptions, chooseSearchDirectoriesButton, folderListView, actionButtons,
 
                 //getLoadingBox(chosenSearchDirectories),
-                searchStatusLabel,
-                searchResultsGridPane,
-                gotoMainAlgorithmScene);
+                searchStatusLabel, searchResultsGridPane, gotoMainAlgorithmScene);
 
         // Final container
         ScrollPane searchScrollPane = new ScrollPane();
@@ -377,7 +419,7 @@ public class Main extends Application {
         searchScrollPane.setPadding(new Insets(20));
         searchScrollPane.setContent(searchSceneContainer);
 
-        return new Scene(searchScrollPane, 1000, 500);
+        return new Scene(searchScrollPane, 1000, 700);
     }
 
     VBox chooseAlgorithmVBox() {
@@ -435,9 +477,7 @@ public class Main extends Application {
 
         HBox hBoxColorsRadioButtons = new HBox(10);
         hBoxColorsRadioButtons.setAlignment(Pos.CENTER);
-        hBoxColorsRadioButtons.getChildren().addAll(twoColorsRadioButton, fourColorsRadioButton, eightColorsRadioButton,
-                sixteenColorsRadioButton, thirtyTwoColorsRadioButton, sixtyFourColorsRadioButton, oneTwoEightColorsRadioButton,
-                twoFiveSixColorsRadioButton);
+        hBoxColorsRadioButtons.getChildren().addAll(twoColorsRadioButton, fourColorsRadioButton, eightColorsRadioButton, sixteenColorsRadioButton, thirtyTwoColorsRadioButton, sixtyFourColorsRadioButton, oneTwoEightColorsRadioButton, twoFiveSixColorsRadioButton);
 
         return hBoxColorsRadioButtons;
     }
@@ -492,8 +532,6 @@ public class Main extends Application {
 //        });
 //        return loadingBarVBox;
 //    }
-
-
 
 
 }

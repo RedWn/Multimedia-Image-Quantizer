@@ -10,10 +10,7 @@ public class SearchTask implements Callable {
     private boolean byDate;
     private boolean bySize;
 
-    public SearchTask(String directory,
-                      boolean byColor,
-                      boolean byDate,
-                      boolean bySize) {
+    public SearchTask(String directory, boolean byColor, boolean byDate, boolean bySize) {
         this.directory = directory;
         this.byColor = byColor;
         this.bySize = bySize;

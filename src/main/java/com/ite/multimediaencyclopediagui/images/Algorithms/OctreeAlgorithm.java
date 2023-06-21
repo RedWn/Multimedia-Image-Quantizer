@@ -5,6 +5,7 @@ import com.ite.multimediaencyclopediagui.images.Pixel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.PriorityQueue;
 
 public class OctreeAlgorithm {
     public static Pixel[] GetQuantizedPixels(Pixel[] imagePixels, int nColors) {
@@ -30,13 +31,13 @@ public class OctreeAlgorithm {
                 String num = firstDigit1 + firstDigit2 + firstDigit3;
                 int index = Integer.parseUnsignedInt(num, 2);
                 tempNode = tempNode.children.get(index);
-                if(depth-i==1){
+                if (depth - i == 1) {
                     tempNode.addColor(color);
                     break;
                 }
             }
         }
-        node.reduce(node, nColors);
+        node.reduce(nColors);
         node.mapColors(colorMap);
         for (int i = 0; i < ans.length; i++) {
             ans[i] = new Pixel();
@@ -108,28 +109,40 @@ class Octree {
         }
     }
 
-    public void reduce(Octree octree, int maxLeafs) {
-        if (octree.leafs.size() == 0) {
+    public void reduce(int nColors) {
+        if (leafs.size() <= nColors) {
             return;
         }
-        if (octree.leafs.size() <= maxLeafs) {
-            return;
-        }
-        for (Octree child : octree.children) {
-            reduce(child, maxLeafs);
-        }
 
-        ArrayList<Pixel> combinedColors = new ArrayList<>();
-        for (Octree child : octree.children) {
-            combinedColors.addAll(child.colors);
-        }
-        octree.colors = combinedColors;
+        PriorityQueue<Octree> queue = new PriorityQueue<>((a, b) -> a.allLeafsColors() - b.allLeafsColors());
+        if (nColors > 64)
+            for (Octree child : children) {
+                for (Octree grandChild : child.children) {
+                    queue.add(grandChild);
+                }
+            }
+        else
+            for (Octree child : children) {
+                queue.add(child);
+            }
 
-        Octree leaf = new Octree();
-        leaf.colors = octree.colors;
-        octree.children.clear();
-        octree.leafs.clear();
-        octree.leafs.add(leaf);
+        while (leafs.size() > nColors) {
+            Octree node = queue.remove();
+            ArrayList<Pixel> combinedColors = new ArrayList<>();
+            for (Octree child : node.children) {
+                combinedColors.addAll(child.colors);
+            }
+            node.colors = combinedColors;
+            leafs.removeAll(node.children);
+            node.children.clear();
+            leafs.add(node);
+
+            for (Octree child : node.children) {
+                if (child.children.size() == 8) {
+                    queue.add(child);
+                }
+            }
+        }
     }
 
     public void mapColors(Map colorMap) {
@@ -144,5 +157,12 @@ class Octree {
         }
     }
 
+    public int allLeafsColors() {
+        int ans = 0;
+        for (Octree leaf : leafs) {
+            ans += leaf.colors.size();
+        }
+        ans += colors.size();
+        return ans;
+    }
 }
-

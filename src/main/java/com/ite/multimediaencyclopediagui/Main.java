@@ -133,6 +133,10 @@ public class Main extends Application {
                 imageViewFirstAlgo.setFitWidth(500);
                 imageViewSecondAlgo.setFitWidth(500);
                 imageViewThirdAlgo.setFitWidth(500);
+                imageViewOriginal.setFitHeight(360);
+                imageViewFirstAlgo.setFitHeight(360);
+                imageViewSecondAlgo.setFitHeight(360);
+                imageViewThirdAlgo.setFitHeight(360);
 
                 hBoxAlgorithmImages.getChildren().addAll(imageViewFirstAlgo, imageViewSecondAlgo, imageViewThirdAlgo);
                 hBoxAlgorithmImages.setAlignment(Pos.CENTER);
@@ -141,7 +145,7 @@ public class Main extends Application {
                 Label labelFirst = new Label("Median Cut Algorithm");
                 Label labelSecond = new Label("Lloyd's Algorithm");
                 Label labelThird = new Label("Octree Algorithm");
-                HBox hBoxLabels = new HBox(360);
+                HBox hBoxLabels = new HBox(340);
                 hBoxLabels.setAlignment(Pos.CENTER);
                 hBoxLabels.getChildren().addAll(labelFirst, labelSecond, labelThird);
 
@@ -149,7 +153,7 @@ public class Main extends Application {
                 vBox.setAlignment(Pos.CENTER);
                 vBox.getChildren().addAll(labelOriginal, imageViewOriginal, hBoxLabels, hBoxAlgorithmImages);
 
-                Scene popUpScene = new Scene(vBox, 1500, 1000);
+                Scene popUpScene = new Scene(vBox, 1500, 780);
                 popUpStage.setTitle("Algorithms");
                 popUpStage.setScene(popUpScene);
                 popUpStage.show();
@@ -394,7 +398,7 @@ public class Main extends Application {
             // Get the selected radio button
             colorsSelectedToggle = (RadioButton) colorsToggleGroupRadioButtons.getSelectedToggle();
         });
-        twoColorsRadioButton.setSelected(true);
+        eightColorsRadioButton.setSelected(true);
 
         twoColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);
         fourColorsRadioButton.setToggleGroup(colorsToggleGroupRadioButtons);

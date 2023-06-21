@@ -2,6 +2,7 @@ package com.ite.multimediaencyclopediagui;
 
 import com.ite.multimediaencyclopediagui.images.Algorithms.LloydsAlgorithm;
 import com.ite.multimediaencyclopediagui.images.Algorithms.MedianCutAlgorithm;
+import com.ite.multimediaencyclopediagui.images.Algorithms.OctreeAlgorithm;
 import com.ite.multimediaencyclopediagui.images.IOIndexed;
 import com.ite.multimediaencyclopediagui.images.ImageUtils;
 import com.ite.multimediaencyclopediagui.images.IndexedImage;
@@ -41,6 +42,7 @@ public class Main extends Application {
     static ImageView imageViewOriginal = new ImageView();
     static ImageView imageViewFirstAlgo = new ImageView();
     static ImageView imageViewSecondAlgo = new ImageView();
+    static ImageView imageViewThirdAlgo = new ImageView();
     static RadioButton colorsSelectedToggle = new RadioButton();
     static RadioButton algorithmSelectedToggle = new RadioButton();
     private final DirectoryChooser directoryChooser = new DirectoryChooser();
@@ -71,6 +73,7 @@ public class Main extends Application {
         imageViewOriginal.setPreserveRatio(true);
         imageViewFirstAlgo.setPreserveRatio(true);
         imageViewSecondAlgo.setPreserveRatio(true);
+        imageViewThirdAlgo.setPreserveRatio(true);
 
         Text resultsDirectoryTextNode = new Text();
         resultsDirectoryTextNode.setText(resultsDirectory);
@@ -101,46 +104,53 @@ public class Main extends Application {
                 // Apply algorithms
                 Pixel[] quantizedPixels = MedianCutAlgorithm.GetQuantizedPixels(originalPicturePixels, Integer.parseInt(colorsSelectedToggle.getText()));
                 Pixel[] quantizedPixels2 = LloydsAlgorithm.GetQuantizedPixels(originalPicturePixels, Integer.parseInt(colorsSelectedToggle.getText()));
+                Pixel[] quantizedPixels3 = OctreeAlgorithm.GetQuantizedPixels(originalPicturePixels, Integer.parseInt(colorsSelectedToggle.getText()));
 
                 // Convert to buffered images
                 BufferedImage bufferedQuantizedImage = ImageUtils.PixelsToImage(quantizedPixels, originalPicture.getWidth(), originalPicture.getHeight(), originalPicture.getType());
                 BufferedImage bufferedQuantizedImage2 = ImageUtils.PixelsToImage(quantizedPixels2, originalPicture.getWidth(), originalPicture.getHeight(), originalPicture.getType());
+                BufferedImage bufferedQuantizedImage3 = ImageUtils.PixelsToImage(quantizedPixels3, originalPicture.getWidth(), originalPicture.getHeight(), originalPicture.getType());
 
                 // Make Java happy
                 Image nonBufferedQuantizedImageToMakeJavaHappy = ImageUtils.ConvertBufferedImageToImage(bufferedQuantizedImage);
                 Image nonBufferedQuantizedImageToMakeJavaHappy2 = ImageUtils.ConvertBufferedImageToImage(bufferedQuantizedImage2);
+                Image nonBufferedQuantizedImageToMakeJavaHappy3 = ImageUtils.ConvertBufferedImageToImage(bufferedQuantizedImage3);
 
                 // Write to disk as indexed images
                 IOIndexed.convertImageToIndexedAndWriteToDisk(bufferedQuantizedImage, Path.of(resultsDirectory, FileUtils.getFileBaseName(chosenFile.getName()) + "_median_cut.rii").toString());
                 IOIndexed.convertImageToIndexedAndWriteToDisk(bufferedQuantizedImage2, Path.of(resultsDirectory, FileUtils.getFileBaseName(chosenFile.getName()) + "_lloyd.rii").toString());
+                IOIndexed.convertImageToIndexedAndWriteToDisk(bufferedQuantizedImage3, Path.of(resultsDirectory, FileUtils.getFileBaseName(chosenFile.getName()) + "_octree.rii").toString());
 
                 // Show results
                 imageViewFirstAlgo.setImage(nonBufferedQuantizedImageToMakeJavaHappy);
                 imageViewSecondAlgo.setImage(nonBufferedQuantizedImageToMakeJavaHappy2);
+                imageViewThirdAlgo.setImage(nonBufferedQuantizedImageToMakeJavaHappy3);
 
                 Stage popUpStage = new Stage();
                 popUpStage.initOwner(window);
-                HBox hBox = new HBox(10);
+                HBox hBoxAlgorithmImages = new HBox(10);
 
                 imageViewOriginal.setFitWidth(500);
                 imageViewFirstAlgo.setFitWidth(500);
                 imageViewSecondAlgo.setFitWidth(500);
+                imageViewThirdAlgo.setFitWidth(500);
 
-                hBox.getChildren().addAll(imageViewOriginal, imageViewFirstAlgo, imageViewSecondAlgo);
-                hBox.setAlignment(Pos.CENTER);
+                hBoxAlgorithmImages.getChildren().addAll(imageViewFirstAlgo, imageViewSecondAlgo, imageViewThirdAlgo);
+                hBoxAlgorithmImages.setAlignment(Pos.CENTER);
 
-                Label label1 = new Label("Original image");
-                Label label2 = new Label("Median Cut Algorithm");
-                Label label3 = new Label("Lloyd's Algorithm");
-                HBox hBoxLabels = new HBox(350);
+                Label labelOriginal = new Label("Original image");
+                Label labelFirst = new Label("Median Cut Algorithm");
+                Label labelSecond = new Label("Lloyd's Algorithm");
+                Label labelThird = new Label("Octree Algorithm");
+                HBox hBoxLabels = new HBox(360);
                 hBoxLabels.setAlignment(Pos.CENTER);
-                hBoxLabels.getChildren().addAll(label1, label2, label3);
+                hBoxLabels.getChildren().addAll(labelFirst, labelSecond, labelThird);
 
-                VBox vBox = new VBox(10);
-                vBox.getChildren().addAll(hBoxLabels, hBox);
+                VBox vBox = new VBox(5);
+                vBox.setAlignment(Pos.CENTER);
+                vBox.getChildren().addAll(labelOriginal, imageViewOriginal, hBoxLabels, hBoxAlgorithmImages);
 
-                Scene popUpScene = new Scene(vBox, 1500, 600);
-
+                Scene popUpScene = new Scene(vBox, 1500, 1000);
                 popUpStage.setTitle("Algorithms");
                 popUpStage.setScene(popUpScene);
                 popUpStage.show();

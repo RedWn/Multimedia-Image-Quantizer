@@ -21,10 +21,10 @@ import java.util.Objects;
 public class Searcher {
     public static float colorThreshold = 5f;
     public static float percentageThreshold = 0.005f;
-    public static int sizeThreshold = 1000000;
+    public static int sizeThreshold = 100000;
     public static int nDays = 7;
     public static int loadingNumber = 0;
-    static int dateThreshold = 86400000 * nDays;
+    static long dateThreshold = 86400 * nDays;
     static IndexedImage targetImage = null;
     static ArrayList<SearchColor> colors;
     static int targetSize;
@@ -65,6 +65,7 @@ public class Searcher {
     }
 
     public static File[] SearchByDate(File[] files) throws IOException {
+        dateThreshold = 86400 * nDays;
         ArrayList<File> ans = new ArrayList<>();
 
         for (File F : Objects.requireNonNull(files)) {
@@ -73,6 +74,8 @@ public class Searcher {
                 if (isDateSuitable(F)) {
                     ans.add(F);
                 }
+                else
+                    System.out.println(F.getAbsoluteFile());
             }
             loadingNumber++;
         }
@@ -143,7 +146,8 @@ public class Searcher {
 
     static boolean isDateSuitable(File F) throws IOException {
         BasicFileAttributes attr = Files.readAttributes(F.toPath(), BasicFileAttributes.class);
-        long temp = Math.abs(targetDate - attr.creationTime().toMillis());
+        System.out.println(attr.creationTime().toMillis()/1000);
+        long temp = Math.abs(targetDate - attr.creationTime().toMillis()/1000);
         if (temp < dateThreshold)
             return true;
         return false;
@@ -212,7 +216,7 @@ public class Searcher {
 
     public static void setDateTarget(File imageToSearchFor) throws IOException {
         BasicFileAttributes attr = Files.readAttributes(imageToSearchFor.toPath(), BasicFileAttributes.class);
-        targetDate = attr.creationTime().toMillis();
+        targetDate = attr.creationTime().toMillis()/1000;
     }
 
     public static void setSizeTarget(File imageToSearchFor) throws IOException {

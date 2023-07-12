@@ -42,7 +42,7 @@ public class OctreeAlgorithm {
         for (int i = 0; i < ans.length; i++) {
             ans[i] = new Pixel();
             ans[i].RGB = colorMap.get(imagePixels[i]).RGB;
-            ans[i].index = i;
+            ans[i].index = imagePixels[i].index;
         }
         return ans;
     }

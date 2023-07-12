@@ -209,6 +209,11 @@ public class Main extends Application {
 
         // Choose directories list and button
         ListView<String> folderListView = new ListView<>();
+
+        folderListView.getItems().add("D:\\Tests\\small_tests");
+        folderListView.getItems().add("D:\\Tests\\old_small_tests");
+        folderListView.getItems().add("D:\\Tests\\big_tests");
+
         folderListView.setMaxSize(600, 100);
         folderListView.scrollTo(10);
 
@@ -279,7 +284,7 @@ public class Main extends Application {
             compressedImage.createGraphics().drawImage(originalImage.getScaledInstance(compressedWidth, compressedHeight, java.awt.Image.SCALE_SMOOTH), 0, 0, null);
 
             try {
-                File newImage = new File("D:/temp/bla.test");
+                File newImage = new File("D:/Tests/bla.test");
 
                 ImageIO.write(
                         compressedImage,
@@ -346,6 +351,8 @@ public class Main extends Application {
                         searchResults.add(file);
                     }
                 }
+
+                System.out.println("Results size: " + searchResults.size());
 
                 searchResults.forEach(file -> {
                     System.out.println(file.getAbsolutePath());

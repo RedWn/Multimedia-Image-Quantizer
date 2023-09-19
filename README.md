@@ -6,7 +6,7 @@ The project aims to compress images using Image Quantization and Indexed Image S
 Another aim is to provide an image searcher to find similar images using different criteria like: color prevelance, size and date.
 
 ## Implentation
-The lanuage is Java with JavaFX to create the GUI.
+The language is Java with JavaFX to create the GUI.
 We are using a model-View arch so that all the algorithms and computations are independent of the GUI and user oriented stuff.
 
 * The Algorithms folder include the 3 quantization algorithms with all related functions.
